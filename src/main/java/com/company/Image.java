@@ -4,11 +4,14 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by ramandika on 18/02/16.
  */
 public class Image {
+
     public static class RGB{
         //Property
         private int red=255;
@@ -30,6 +33,17 @@ public class Image {
     private RGB[] pixelsRGB;
 
     //Method
+    public Image(String path) {
+        try {
+            BufferedImage image = ImageIO.read(this.getClass().getResource(path));
+            setWidth(image.getWidth());
+            setHeigth(image.getHeight());
+            setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(), getPixels(), 0,image.getWidth()));
+        } catch (IOException ex) {
+            Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public int[] getPixels() {
         return pixels;
     }
