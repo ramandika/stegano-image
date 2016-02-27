@@ -14,8 +14,8 @@ import java.util.List;
 
 public class Main {
     
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        File file = new File("data/message/foto.jpg");
+    public static void main(String[] args) throws FileNotFoundException, IOException,Exception {
+/*        File file = new File("data/message/foto.jpg");
         byte[] fileData = new byte[(int)file.length()];
         FileInputStream in = new FileInputStream(file);
         in.read(fileData);
@@ -34,13 +34,14 @@ public class Main {
         outputStream = new FileOutputStream(new File("data/message/decrypted.jpg"));
         outputStream.write(encrypted);
         outputStream.close();
-//        byte[] strBin = "Hello".getBytes();
-//        for(byte b : strBin) {
-//            for(int i=0; i<8; i++) {
-//                System.out.print(Integer.toBinaryString((b & 0xff) & (1 << 7-i))+' ');
-//            }
-//            System.out.println();
-//        }
+        byte[] strBin = "Hello".getBytes();
+        for(byte b : strBin) {
+            for(int i=0; i<8; i++) {
+                System.out.print(Integer.toBinaryString((b & 0xff) & (1 << 7-i))+' ');
+            }
+            System.out.println();
+        }*/
+        FuncTest.testConjugate();
     }
     
 }

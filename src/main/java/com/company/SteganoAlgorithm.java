@@ -27,7 +27,10 @@ public class SteganoAlgorithm {
     private static int wh;
     private static int he;
     private static List<boolean[][]> messageBlock;
-    public static class BitPlane {          // 8 bit plane utk 1 blok dengan
+    public static class BitPlane {// 8 bit plane utk 1 blok dengan
+        public BitPlane(){
+            bp=new ArrayList();
+        };
         public List<boolean[][]> bp;        // sizenya pasti 8 (bitplane [0,7])
     }
     
@@ -77,7 +80,7 @@ public class SteganoAlgorithm {
      * @param c kode warna [R,G,B]
      * @return kumpulan BitPlane utk satu warna tertentu
      */
-    private static List<BitPlane> toPBC(List<int[][]> input,char c){
+    public static List<BitPlane> toPBC(List<int[][]> input,char c){
         int size=input.size();
         List<BitPlane> res=new ArrayList();
         for(int i=0;i<size;i++) {
@@ -108,7 +111,7 @@ public class SteganoAlgorithm {
      * @param input
      * @return 
      */
-    private static List<BitPlane> XOR(List<BitPlane> input) {
+    public static List<BitPlane> XOR(List<BitPlane> input) {
         int size=input.size();                                      // jumlah blok 8x8 dalam sebuah gambar
         List<BitPlane> cgcres=new ArrayList();
         for(int i=0;i<size;i++){
@@ -119,9 +122,9 @@ public class SteganoAlgorithm {
                 boolean[][] res8x8=new boolean[M][N];
                 for(int x=0;x<M;x++)
                     for(int y=0;y<N;y++){
-                        if(x==0) res8x8[x][y]=bp8x8[x][y];
+                        if(y==0) res8x8[x][y]=bp8x8[x][y];
                         else{
-                            res8x8[x][y]=bp8x8[x][y]^bp8x8[x-1][y];
+                            res8x8[x][y]=bp8x8[x][y]^bp8x8[x][y-1];
                         }
                     }
                 cgc.bp.add(res8x8);
@@ -136,7 +139,7 @@ public class SteganoAlgorithm {
      * @param input
      * @return 
      */
-    private static boolean isComplexEnough(boolean[][] input){
+    public static boolean isComplexEnough(boolean[][] input){
         int counter=0;
         boolean enough;
         double result;
@@ -151,7 +154,8 @@ public class SteganoAlgorithm {
                     if(j+1<M) counter+=(input[i][j]^input[i][j+1]) ? 1:0;//xor kanan
                 }
             }
-        result=counter/max8x8changing;
+        result=(double)counter/max8x8changing;
+        System.out.println(counter+"/"+max8x8changing+"="+result);
         return result>=alpha;
     }
     
@@ -160,7 +164,7 @@ public class SteganoAlgorithm {
      * @param input
      * @return 
      */
-    private static boolean[][] conjugate(boolean[][] input){            // convert bit pesan ke dalam bentuk yang lebih kompleks
+    public static boolean[][] conjugate(boolean[][] input){            // convert bit pesan ke dalam bentuk yang lebih kompleks
         boolean[][] boolres=new boolean[M][N];
         for(int i=0;i<N;i++)
             for(int j=0;j<M;j++)
@@ -264,8 +268,7 @@ public class SteganoAlgorithm {
         return NbBit;
     }
     
-    public static Image Insert(String imgPath, List<Boolean> binaryMsg, double treshold) {
-        alpha = treshold;
+    public static Image Insert(String imgPath, List<Boolean> binaryMsg,List<Integer> pos) {
         bitplanes = to8x8(new Image(imgPath));
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
         List<BitPlane> greenPBC = toPBC(bitplanes, 'G');

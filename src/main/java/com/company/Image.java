@@ -33,6 +33,11 @@ public class Image {
     private RGB[] pixelsRGB;
 
     //Method
+    public Image(int pixels[],int row, int col){
+        this.width=col;
+        this.heigth=row;
+        this.pixels=pixels;
+    }
     public Image(String path) {
         try {
             BufferedImage image = ImageIO.read(this.getClass().getResource(path));
