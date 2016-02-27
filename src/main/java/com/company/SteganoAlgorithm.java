@@ -1,8 +1,7 @@
 package com.company;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by ramandika on 18/02/16.
@@ -301,6 +300,14 @@ public class SteganoAlgorithm {
 //            }
 //        }
         return null;
+    }
+
+    public List<Integer> genUniqRandSeq(int seed, int size){
+        List<Integer> list=new ArrayList();
+        for(int i=0;i<size;i++)
+            list.add(i);
+        Collections.shuffle(list, new Random(seed));
+        return list;
     }
 
     public static String Extract(Image i,String key){
