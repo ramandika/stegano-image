@@ -52,6 +52,8 @@ public class GUIStegano extends javax.swing.JFrame {
         JLabelDekripMessage = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jTextField2 = new javax.swing.JTextField();
         JPanelEnkrip = new javax.swing.JPanel();
         jlabelEnkripMessage = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -59,11 +61,18 @@ public class GUIStegano extends javax.swing.JFrame {
         jLabelEnkripImage = new javax.swing.JLabel();
         jButtonEnkrip = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
+        jTextField3 = new javax.swing.JTextField();
         JPanelCompare = new javax.swing.JPanel();
         JButtonCompare1 = new javax.swing.JButton();
         jLabelImageCompare1 = new javax.swing.JLabel();
         JButtonCompare2 = new javax.swing.JButton();
         jLabelImageCompare2 = new javax.swing.JLabel();
+        jButton6 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,6 +96,10 @@ public class GUIStegano extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setText("Vigenere Dekrip");
+
+        jTextField2.setText("Keyword");
+
         javax.swing.GroupLayout jPanelDekripLayout = new javax.swing.GroupLayout(jPanelDekrip);
         jPanelDekrip.setLayout(jPanelDekripLayout);
         jPanelDekripLayout.setHorizontalGroup(
@@ -101,11 +114,13 @@ public class GUIStegano extends javax.swing.JFrame {
                     .addComponent(jButtonSelectImageD))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelDekripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(JLabelDekripMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanelDekripLayout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton5)))
+                        .addGap(158, 158, 158)
+                        .addComponent(jButton5))
+                    .addComponent(JLabelDekripMessage)
+                    .addComponent(jButton3)
+                    .addComponent(jTextField2))
                 .addContainerGap(105, Short.MAX_VALUE))
         );
         jPanelDekripLayout.setVerticalGroup(
@@ -123,12 +138,17 @@ public class GUIStegano extends javax.swing.JFrame {
                             .addComponent(jButton5))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelDekripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(JLabelDekripMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabelDekripImage, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanelDekripLayout.createSequentialGroup()
+                                .addComponent(jLabelDekripImage, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 26, Short.MAX_VALUE))
+                            .addGroup(jPanelDekripLayout.createSequentialGroup()
+                                .addComponent(JLabelDekripMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jTextField2)))))
+                .addContainerGap())
         );
-
-        jLabelDekripImage.getAccessibleContext().setAccessibleName("");
 
         jTabbedPane.addTab("Dekrip", jPanelDekrip);
 
@@ -155,42 +175,66 @@ public class GUIStegano extends javax.swing.JFrame {
             }
         });
 
+        jTextField1.setText("threshold");
+
+        jLabel3.setText("Result :");
+
+        jButton4.setText("Enkrip Vigenere");
+
+        jTextField3.setText("Keyword");
+
         javax.swing.GroupLayout JPanelEnkripLayout = new javax.swing.GroupLayout(JPanelEnkrip);
         JPanelEnkrip.setLayout(JPanelEnkripLayout);
         JPanelEnkripLayout.setHorizontalGroup(
             JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(JPanelEnkripLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelEnkripLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jlabelEnkripMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jTextField3)
+                    .addComponent(jlabelEnkripMessage, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, JPanelEnkripLayout.createSequentialGroup()
+                        .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jButton4))
+                        .addGap(0, 140, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
                 .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(JPanelEnkripLayout.createSequentialGroup()
-                        .addComponent(jButtonSelectImageE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonEnkrip)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2))
-                    .addComponent(jLabelEnkripImage, javax.swing.GroupLayout.PREFERRED_SIZE, 406, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(JPanelEnkripLayout.createSequentialGroup()
+                            .addComponent(jButtonSelectImageE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButtonEnkrip)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jTextField1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabelEnkripImage, javax.swing.GroupLayout.PREFERRED_SIZE, 406, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel3))
+                .addGap(47, 47, 47))
         );
         JPanelEnkripLayout.setVerticalGroup(
             JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(JPanelEnkripLayout.createSequentialGroup()
-                .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(JPanelEnkripLayout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jlabelEnkripMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 305, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(JPanelEnkripLayout.createSequentialGroup()
-                        .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButtonSelectImageE)
-                            .addComponent(jButtonEnkrip)
-                            .addComponent(jButton2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabelEnkripImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(6, 6, 6)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jlabelEnkripMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(JPanelEnkripLayout.createSequentialGroup()
+                .addGroup(JPanelEnkripLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonSelectImageE)
+                    .addComponent(jButtonEnkrip)
+                    .addComponent(jButton2)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8)
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabelEnkripImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane.addTab("Enkrip", JPanelEnkrip);
@@ -209,6 +253,10 @@ public class GUIStegano extends javax.swing.JFrame {
             }
         });
 
+        jButton6.setText("Analyze");
+
+        jLabel4.setText("PNSR");
+
         javax.swing.GroupLayout JPanelCompareLayout = new javax.swing.GroupLayout(JPanelCompare);
         JPanelCompare.setLayout(JPanelCompareLayout);
         JPanelCompareLayout.setHorizontalGroup(
@@ -218,14 +266,22 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addGroup(JPanelCompareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelCompareLayout.createSequentialGroup()
                         .addComponent(JButtonCompare1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 262, Short.MAX_VALUE)
                         .addComponent(JButtonCompare2)
                         .addGap(266, 266, 266))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPanelCompareLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabelImageCompare1, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(4, 4, 4)
                         .addComponent(jLabelImageCompare2, javax.swing.GroupLayout.PREFERRED_SIZE, 351, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(JPanelCompareLayout.createSequentialGroup()
+                        .addComponent(jButton6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         JPanelCompareLayout.setVerticalGroup(
             JPanelCompareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,10 +289,15 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addGroup(JPanelCompareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(JButtonCompare1)
                     .addComponent(JButtonCompare2))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(JPanelCompareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabelImageCompare2, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabelImageCompare1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(JPanelCompareLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton6)
+                    .addComponent(jLabel4)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -251,7 +312,7 @@ public class GUIStegano extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -383,18 +444,27 @@ public class GUIStegano extends javax.swing.JFrame {
     private javax.swing.JPanel JPanelEnkrip;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JButton jButtonEnkrip;
     private javax.swing.JButton jButtonSelectImageD;
     private javax.swing.JButton jButtonSelectImageE;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabelDekripImage;
     private javax.swing.JLabel jLabelEnkripImage;
     private javax.swing.JLabel jLabelImageCompare1;
     private javax.swing.JLabel jLabelImageCompare2;
     private javax.swing.JPanel jPanelDekrip;
     private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jlabelEnkripMessage;
     // End of variables declaration//GEN-END:variables
 }
