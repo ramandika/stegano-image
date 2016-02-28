@@ -3,6 +3,8 @@ package com.company;
 
 import javafx.util.Pair;
 
+import java.io.File;
+import java.io.PrintWriter;
 import java.text.CollationElementIterator;
 import java.util.*;
 
@@ -12,9 +14,9 @@ import java.util.*;
 public class SteganoAlgorithm {
     private static final boolean F=false;
     private static final boolean T=true;
-    private final static int M=8,N=8;               // M col N row
+    public static int M=8,N=8;               // M col N row
     private final static int max8x8changing=112;    // jumlah maksimal kemungkinan perubahan warna pada 8x8
-    private static double alpha;                    // default treshold
+    private static double alpha=0.48;                    // default treshold
     private static List<int[][]> bitplanes;         // kumpulan blok 8x8 sebuah gambar
     private static final boolean[][] chessBoard = {   // buat conjugate
             {F,T,F,T,F,T,F,T},
@@ -26,8 +28,8 @@ public class SteganoAlgorithm {
             {F,T,F,T,F,T,F,T},
             {T,F,T,F,T,F,T,F},
     };
-    private static int wh;
-    private static int he;
+    public static int wh;
+    public static int he;
     private static List<boolean[][]> messageBlock;
     public static class BitPlane {// 8 bit plane utk 1 blok dengan
         public BitPlane(){
@@ -76,33 +78,48 @@ public class SteganoAlgorithm {
         return bitplanes;
     }
 
-    public static List<int[][]> pbcTo8x8(List<List<BitPlane>> bitplanes){
-        List<int[][]> listPixels=null;
-        for(int i=0;i<bitplanes.size();i++){//bp[0]=red;bp[1]=green;bp[2]==blue
-            List<boolean[][]> listbool=bitplanes.get(i).get(i).bp;
-            int[][] pixels=null;
-            for(int j=0;j<listbool.size();j++){
+    public static List<int[][]> pbcTo8x8(List<List<BitPlane>> rgbBp){
+        List<int[][]> listPixels=new ArrayList();
+        for(int i=0;i<rgbBp.size();i++){//bp[0]=red;bp[1]=green;bp[2]==blue
+            List<BitPlane> bitplanes = rgbBp.get(i);
+            for(int j=0;j<bitplanes.size();j++){
+                List<boolean[][]> listbool=bitplanes.get(j).bp; // j posisi 8x8
+                int[][] pixels=null;
                 if(i>0) pixels=listPixels.get(j);
                 else pixels=new int[8][8];
-                boolean[][] temp=listbool.get(j);
-                for(int a=0;a<8;a++)
-                    for(int b=0;b<8;b++)
-                        pixels[a][b]+=((temp[a][b]? 1:0) <<(8*(2-i)+j)); //redd slide 16+j, green slide 8+j, blue slide j
+                for(int k=0;k<listbool.size();k++){ // k urutan bit
+                    boolean[][] temp=listbool.get(k);
+                    for(int a=0;a<8;a++)
+                        for(int b=0;b<8;b++)
+                            pixels[a][b]+=((temp[a][b]? 1:0) <<(8*(2-i)+k)); //redd slide 16+j, green slide 8+j, blue slide j
+                }
+                if(i==0)listPixels.add(pixels);
             }
-            listPixels.add(pixels);
+/*            if(i==0)
+                for(int idx=0;idx<listPixels.size();idx++){
+                    System.out.println("Index 8x8 ke-"+idx);
+                    for(int x=0;x<8;x++) {
+                        for (int y = 0; y < 8; y++)
+                            System.out.print(listPixels.get(idx)[x][y] + " ");
+                        System.out.println();
+                    }
+                    System.out.println("=========================");
+                }*/
         }
         return listPixels;
     }
 
-    public static Image convert8x8ToImage(List<int[][]> lb,int w,int h){
-        int size=w*h,row,col,i8x8;
+    public static int[] convert8x8ToPixels(List<int[][]> lb,int w,int h){
+        int size=w*h;//,row,col,i8x8;
         int[] pixels=new int[size];
-        for(int i=0;i<size;i++){
-            i8x8=i/wh;
-            row=i/wh;
-            col=i/he;
-            pixels[i]=lb.get(i8x8)[row][col];
+        System.out.println("size:"+size);
+        System.out.println(w+" "+h);
+        System.out.println(wh+" "+he);
+        for(int i=0;i<size;i++) {
+            //System.out.println((i % w) / M + (i / (M * w)) * wh);
+            pixels[i] = lb.get((i % w) / M + (i / (M * w)) * wh)[(i / w) % M][(i % w) % N];
         }
+        return pixels;
     }
     
     /**
@@ -186,7 +203,7 @@ public class SteganoAlgorithm {
                 }
             }
         result=(double)counter/max8x8changing;
-        System.out.println(counter+"/"+max8x8changing+"="+result);
+        //System.out.println(counter+"/"+max8x8changing+"="+result);
         return result>=alpha;
     }
     
@@ -230,26 +247,24 @@ public class SteganoAlgorithm {
      * @return 
      */
     public static List<boolean[][]> convertMessageToMatrix(List<Boolean> message) {
-        List<boolean[][]> messageBitplane = null;
+        List<boolean[][]> messageBitplane = new ArrayList();
+        System.out.println("ukuran message : "+ message.size());
         boolean[][] messageMatrix;
         
         for(int x=0; x<message.size(); x++) {
             messageMatrix = new boolean[8][8];
             for(int i=0; i<messageMatrix.length; i++) {
-                if(x<message.size()) {
-                    for(int j=0; j<messageMatrix[i].length; j++) {
-                        if(i==0&&j==0) {
-                            messageMatrix[i][j] = false;
-                        }
-                        else {
+                for(int j=0; j<messageMatrix[i].length; j++) {
+                    if(i==0&&j==0) {
+                        messageMatrix[i][j] = false;
+                    }
+                    else {
+                        if(x<message.size()) {
                             messageMatrix[i][j] = message.get(x);
                             x++;
                         }
-                    }
-                }
-                else {
-                    for(int j=0; j<messageMatrix[i].length; j++) {
-                        messageMatrix[i][j] = false;
+                        else
+                            messageMatrix[i][j] = false;
                     }
                 }
             }
@@ -393,8 +408,9 @@ public class SteganoAlgorithm {
 
         /*Green Shuffle*/
         keys=new ArrayList(greenComplex.keySet());
-        List<Pair<Integer, List<Integer>>> greenComplexShuf=null;
+        templist=null;
         Collections.shuffle(keys,new Random(seed));
+        List<Pair<Integer, List<Integer>>> greenComplexShuf=null;
         for (Object o : keys) {
             greenComplexShuf = new ArrayList();
             templist=greenComplex.get(o);
@@ -444,16 +460,120 @@ public class SteganoAlgorithm {
         return null;
     }
     
-    public static Image insertText(String imgPath, String message, String key) throws Exception {
-        int idxSeq = -1;
+    /*//public static Image insertText(String imgPath, String message, String key) throws Exception {
+    public static void insertText() throws Exception {
+       *//* int idxSeq = -1;
+        String cipher = CipherTools.encryptVigenereExtended(message, key);
+        List<Boolean> binaryMsg = convertMessageToBinary(cipher);
+        List<boolean[][]> msgMatrix = new ArrayList();
+        msgMatrix.add(convertIntToMatrix(0));                       // parameternya info size header, 0 karena bukan nyisipin file
+        msgMatrix.add(convertIntToMatrix(message.length()));        // parameternya info size dr text yang akan di-embed
+        msgMatrix.addAll(convertMessageToMatrix(binaryMsg));*//*
+        Scanner scanner = new Scanner(new File("pixels_example.txt"));
+        int[] pixels=new int[18*16];
+        int idx=0;
+        while(scanner.hasNextInt())
+        {
+            pixels[idx++]=scanner.nextInt();
+        }
+        Image img=new Image(pixels,18,16);
+        //bitplanes = to8x8(new Image(imgPath));
+        bitplanes = to8x8(img);
+        //Print 8x8
+        PrintWriter writer=new PrintWriter("8x8suram.txt");
+        for(int i=0;i<bitplanes.size();i++){
+            System.out.println("Posisi ke-"+i);
+            for(int a=0;a<8;a++) {
+                for (int b = 0; b < 8; b++)
+                    writer.print(bitplanes.get(i)[a][b]+" ");
+                writer.println();
+            }
+            writer.println("======================================");
+        }
+        writer.close();
+        List<BitPlane> redPBC = toPBC(bitplanes, 'R');
+        List<BitPlane> greenPBC = toPBC(bitplanes, 'G');
+        List<BitPlane> bluePBC = toPBC(bitplanes, 'B');
+        List<List<BitPlane>> rgbPBC=new ArrayList();
+        rgbPBC.add(redPBC);
+        rgbPBC.add(greenPBC);
+        rgbPBC.add(bluePBC);
+        List<int[][]> pixel8x8=pbcTo8x8(rgbPBC);
+        writer=new PrintWriter("8x8test.txt");
+        for(int i=0;i<pixel8x8.size();i++){
+            System.out.println("Posisi ke-"+i);
+            for(int a=0;a<8;a++) {
+                for (int b = 0; b < 8; b++)
+                    writer.print(pixel8x8.get(i)[a][b]+" ");
+                writer.println();
+            }
+            writer.println("======================================");
+        }
+        writer.close();
+*//*        List<BitPlane> redCGC = XOR(redPBC);
+        List<BitPlane> greenCGC = XOR(greenPBC);
+        List<BitPlane> blueCGC = XOR(bluePBC);
+
+        Map<Integer,List<Integer>> redComplex=getComplexPlanes(redCGC);
+        Map<Integer,List<Integer>> greenComplex=getComplexPlanes(greenCGC);
+        Map<Integer,List<Integer>> blueComplex=getComplexPlanes(blueCGC);
+        int seed=getSeedFromKey(key);
+
+        *//**//*RED shuffle*//**//*
+        List keys = new ArrayList(redComplex.keySet());
+        List templist;
+        Collections.shuffle(keys,new Random(seed));
+        List<Pair<Integer, List<Integer>>> redComplexShuf=null;
+        for (Object o : keys) {
+            redComplexShuf = new ArrayList();
+            templist=redComplex.get(o);
+            if(templist!=null)Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, redComplex.get(o));
+            redComplexShuf.add(p);
+        }
+
+        *//**//*Green Shuffle*//**//*
+        keys=new ArrayList(greenComplex.keySet());
+        List<Pair<Integer, List<Integer>>> greenComplexShuf=null;
+        Collections.shuffle(keys,new Random(seed));
+        for (Object o : keys) {
+            greenComplexShuf = new ArrayList();
+            templist=greenComplex.get(o);
+            Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, greenComplex.get(o));
+            greenComplexShuf.add(p);
+        }
+        *//**//*Blue shuffle*//**//*
+        keys=new ArrayList(blueComplex.keySet());
+        List<Pair<Integer, List<Integer>>> blueComplexShuf=null;
+        Collections.shuffle(keys,new Random(seed));
+        for (Object o : keys) {
+            blueComplexShuf = new ArrayList();
+            templist=blueComplex.get(o);
+            Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, blueComplex.get(o));
+            blueComplexShuf.add(p);
+        }*//*
+//        redPBC = XOR(redCGC);
+//        greenPBC = XOR(greenCGC);
+//        bluePBC = XOR(blueCGC);
+//
+//        // BALIKIN KE GAMBAR
+//        // MASIH BINGUNG
+//        // TOLONG LANJUTIN YEEE
+//
+    }*/
+
+    public static void insertText(String imgPath, String message, String key) throws Exception {
+        int idxSeq = 0;
         String cipher = CipherTools.encryptVigenereExtended(message, key);
         List<Boolean> binaryMsg = convertMessageToBinary(cipher);
         List<boolean[][]> msgMatrix = new ArrayList();
         msgMatrix.add(convertIntToMatrix(0));                       // parameternya info size header, 0 karena bukan nyisipin file
         msgMatrix.add(convertIntToMatrix(message.length()));        // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
-        
-        bitplanes = to8x8(new Image(imgPath));
+        Image image=new Image(imgPath);
+        bitplanes = to8x8(image);
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
         List<BitPlane> greenPBC = toPBC(bitplanes, 'G');
         List<BitPlane> bluePBC = toPBC(bitplanes, 'B');
@@ -465,70 +585,101 @@ public class SteganoAlgorithm {
         Map<Integer,List<Integer>> greenComplex=getComplexPlanes(greenCGC);
         Map<Integer,List<Integer>> blueComplex=getComplexPlanes(blueCGC);
         int seed=getSeedFromKey(key);
-        Collections.shuffle(redComplex, new Random(seed));
-        Collections.shuffle(greenComplex,new Random(seed));
-        Collections.shuffle(blueComplex,new Random(seed));
 
-        for(int i=0; i<redCGC.size(); i++) {                        // seluruh blok 8x8
-            if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
-                for(int j=0; j<redCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
-                    if(isComplexEnough(redCGC.get(i).bp.get(j))) {
-                        idxSeq++;
-                        if(randSeq.contains(idxSeq)) {
-                            if(isComplexEnough(msgMatrix.get(randSeq.indexOf(idxSeq)))) {
-                                redCGC.get(i).bp.set(j, msgMatrix.get(randSeq.indexOf(idxSeq)));
-                            }
-                            else {
-                                redCGC.get(i).bp.set(j, conjugate(msgMatrix.get(randSeq.indexOf(idxSeq))));
-                            }
-                        }
-                    }
+        /*RED shuffle*/
+        List keys = new ArrayList(redComplex.keySet());
+        List templist;
+        Collections.shuffle(keys,new Random(seed));
+        List<Pair<Integer, List<Integer>>> redComplexShuf=null;
+        for (Object o : keys) {
+            redComplexShuf = new ArrayList();
+            templist=redComplex.get(o);
+            if(templist!=null)Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, redComplex.get(o));
+            redComplexShuf.add(p);
+        }
+
+        /*Green Shuffle*/
+        keys=new ArrayList(greenComplex.keySet());
+        templist=null;
+        Collections.shuffle(keys,new Random(seed));
+        List<Pair<Integer, List<Integer>>> greenComplexShuf=null;
+        for (Object o : keys) {
+            greenComplexShuf = new ArrayList();
+            templist=greenComplex.get(o);
+            if(templist!=null)Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, greenComplex.get(o));
+            greenComplexShuf.add(p);
+        }
+        /*Blue shuffle*/
+        keys=new ArrayList(blueComplex.keySet());
+        templist=null;
+        List<Pair<Integer, List<Integer>>> blueComplexShuf=null;
+        Collections.shuffle(keys,new Random(seed));
+        for (Object o : keys) {
+            blueComplexShuf = new ArrayList();
+            templist=blueComplex.get(o);
+            if(templist!= null)Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, blueComplex.get(o));
+            blueComplexShuf.add(p);
+        }
+
+        //Replace redComplex
+        for(int i=0;i<redComplexShuf.size() && idxSeq<msgMatrix.size();i++){
+            Pair<Integer,List<Integer>> temp=redComplexShuf.get(i);
+            int pos= temp.getKey();
+            List<Integer> bits=temp.getValue();
+            if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
+                for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
+                    boolean[][] imgbool=redCGC.get(pos).bp.get(bits.get(j));
+                    for(int a=0;a<8;a++)
+                        for(int b=0;b<8;b++)
+                            imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
+                    idxSeq++;
                 }
             }
         }
-/*        for(int i=0; i<greenCGC.size(); i++) {                        // seluruh blok 8x8
-            if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
-                for(int j=0; j<greenCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
-                    if(isComplexEnough(greenCGC.get(i).bp.get(j))) {
-                        idxSeq++;
-                        if(randSeq.contains(idxSeq)) {
-                            if(isComplexEnough(msgMatrix.get(randSeq.indexOf(idxSeq)))) {
-                                greenCGC.get(i).bp.set(j, msgMatrix.get(randSeq.indexOf(idxSeq)));
-                            }
-                            else {
-                                greenCGC.get(i).bp.set(j, conjugate(msgMatrix.get(randSeq.indexOf(idxSeq))));
-                            }
-                        }
-                    }
+        //Replace greemCompex
+        for(int i=0;i<greenComplexShuf.size() && idxSeq<msgMatrix.size();i++){
+            Pair<Integer,List<Integer>> temp=greenComplexShuf.get(i);
+            int pos= temp.getKey();
+            List<Integer> bits=temp.getValue();
+            if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
+                for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
+                    boolean[][] imgbool=greenCGC.get(pos).bp.get(bits.get(j));
+                    for(int a=0;a<8;a++)
+                        for(int b=0;b<8;b++)
+                            imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
+                    idxSeq++;
                 }
             }
         }
-        for(int i=0; i<blueCGC.size(); i++) {                        // seluruh blok 8x8
-            if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
-                for(int j=0; j<blueCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
-                    if(isComplexEnough(blueCGC.get(i).bp.get(j))) {
-                        idxSeq++;
-                        if(randSeq.contains(idxSeq)) {
-                            if(isComplexEnough(msgMatrix.get(randSeq.indexOf(idxSeq)))) {
-                                blueCGC.get(i).bp.set(j, msgMatrix.get(randSeq.indexOf(idxSeq)));
-                            }
-                            else {
-                                blueCGC.get(i).bp.set(j, conjugate(msgMatrix.get(randSeq.indexOf(idxSeq))));
-                            }
-                        }
-                    }
+
+        //Replace blueComplex
+        for(int i=0;i<blueComplexShuf.size() && idxSeq<msgMatrix.size();i++){
+            Pair<Integer,List<Integer>> temp=blueComplexShuf.get(i);
+            int pos= temp.getKey();
+            List<Integer> bits=temp.getValue();
+            if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
+                for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
+                    boolean[][] imgbool=blueCGC.get(pos).bp.get(bits.get(j));
+                    for(int a=0;a<8;a++)
+                        for(int b=0;b<8;b++)
+                            imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
+                    idxSeq++;
                 }
             }
-        }*/
+        }
+
         redPBC = XOR(redCGC);
         greenPBC = XOR(greenCGC);
         bluePBC = XOR(blueCGC);
-        
-        // BALIKIN KE GAMBAR
-        // MASIH BINGUNG
-        // TOLONG LANJUTIN YEEE
-        
-        return null;
+        //System.out.println(redPBC.size()+" "+greenPBC.size()+" "+bluePBC.size());
+        List<List<BitPlane>> lbp=new ArrayList();
+        lbp.add(redPBC); lbp.add(greenPBC);lbp.add(bluePBC);
+        bitplanes=pbcTo8x8(lbp);
+        image.setPixels(convert8x8ToPixels(bitplanes,image.getWidth(),image.getHeigth()));
+        image.saveImage("imagestegano.bmp");
     }
 
     public static String Extract(Image i,String key){

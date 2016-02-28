@@ -3,6 +3,7 @@ package com.company;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +41,8 @@ public class Image {
     }
     public Image(String path) {
         try {
-            BufferedImage image = ImageIO.read(this.getClass().getResource(path));
+            System.out.println(path);
+            BufferedImage image = ImageIO.read(new FileInputStream(path));
             setWidth(image.getWidth());
             setHeigth(image.getHeight());
             setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(), getPixels(), 0,image.getWidth()));
@@ -48,7 +50,7 @@ public class Image {
             Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public int[] getPixels() {
         return pixels;
     }
@@ -110,8 +112,10 @@ public class Image {
     public void saveImage(String filename) throws IOException {
         BufferedImage bufferedImage = new BufferedImage(width, heigth, BufferedImage.TYPE_INT_RGB);
         bufferedImage.setRGB(0,0,width,heigth,pixels,0,width);
+        System.out.println(filename);
         File outputfile = new File(filename);
-        String format=filename.substring(filename.indexOf('.'),filename.length());
+        String format=filename.substring(filename.indexOf('.')+1,filename.length());
         ImageIO.write(bufferedImage, format, outputfile);
+        System.out.println(format);
     }
 }
