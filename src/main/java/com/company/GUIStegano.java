@@ -7,8 +7,15 @@ package com.company;
 
 import java.awt.Image;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.SpinnerNumberModel;
 
 /**
@@ -16,6 +23,8 @@ import javax.swing.SpinnerNumberModel;
  * @author Kevin
  */
 public class GUIStegano extends javax.swing.JFrame {
+    boolean useEncryption;
+    private File secretFile;
 
     /**
      * Creates new form GUIStegano
@@ -26,8 +35,14 @@ public class GUIStegano extends javax.swing.JFrame {
         this.setResizable(false);
         inputTextRadioButton.setSelected(true);
         selectFileButton.setEnabled(false);
-        SpinnerNumberModel model = new SpinnerNumberModel(0.3, 0.09, 0.50, 0.05);
-        complexitySpinner.setModel(model);
+        extractedTextArea.setEnabled(false);
+        decryptedTextArea.setEnabled(false);
+        decryptButton.setEnabled(false);
+        saveButton.setEnabled(false);
+        extractButton.setEnabled(false);
+        complexitySpinner.setModel(new SpinnerNumberModel(0.3, 0.09, 0.50, 0.05));
+        useEncryption = false;
+        secretFile = null;
     }
 
     /**
@@ -53,32 +68,34 @@ public class GUIStegano extends javax.swing.JFrame {
         inputTextRadioButton = new javax.swing.JRadioButton();
         inputFileRadioButton = new javax.swing.JRadioButton();
         jLabel7 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
+        stegoKeyTextField = new javax.swing.JTextField();
         complexitySpinner = new javax.swing.JSpinner();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         PSNRvalue = new javax.swing.JLabel();
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jButton1 = new javax.swing.JButton();
+        useEncryptionCheckBox = new javax.swing.JCheckBox();
+        embedButton = new javax.swing.JButton();
+        saveStegoButton = new javax.swing.JButton();
         extractingPanel = new javax.swing.JPanel();
         selectStegoButton = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
         inputStegoLabel = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
-        jButton3 = new javax.swing.JButton();
+        stegoKeyExtractTextField = new javax.swing.JTextField();
+        extractButton = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        decryptedTextArea = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea3 = new javax.swing.JTextArea();
-        jButton2 = new javax.swing.JButton();
+        extractedTextArea = new javax.swing.JTextArea();
+        decryptButton = new javax.swing.JButton();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         decryptedFileHeaderLabel = new javax.swing.JLabel();
         extractedFileHeaderLabel = new javax.swing.JLabel();
+        saveButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -120,15 +137,32 @@ public class GUIStegano extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setText("Stego-key");
+        jLabel7.setText("Stego-key (max: 25 chars)");
 
         jLabel8.setText("Complexity treshold");
 
         jLabel9.setText("PSNR : ");
 
-        jCheckBox1.setText("Encrypt message");
+        useEncryptionCheckBox.setText("Encrypt message");
+        useEncryptionCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useEncryptionCheckBoxActionPerformed(evt);
+            }
+        });
 
-        jButton1.setText("Start Embedding");
+        embedButton.setText("Start Embedding");
+        embedButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                embedButtonActionPerformed(evt);
+            }
+        });
+
+        saveStegoButton.setText("Save stego-image..");
+        saveStegoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveStegoButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout embeddingPanelLayout = new javax.swing.GroupLayout(embeddingPanel);
         embeddingPanel.setLayout(embeddingPanelLayout);
@@ -149,7 +183,7 @@ public class GUIStegano extends javax.swing.JFrame {
                         .addGroup(embeddingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(inputTextRadioButton)
                             .addComponent(jLabel7)
-                            .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(stegoKeyTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(messageTextArea, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(embeddingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -164,15 +198,17 @@ public class GUIStegano extends javax.swing.JFrame {
                     .addGroup(embeddingPanelLayout.createSequentialGroup()
                         .addGroup(embeddingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
-                            .addComponent(jCheckBox1)
-                            .addComponent(jButton1)
-                            .addGroup(embeddingPanelLayout.createSequentialGroup()
-                                .addComponent(selectImageButton)
-                                .addGap(263, 263, 263)
-                                .addComponent(jLabel9)
-                                .addGap(7, 7, 7)
-                                .addComponent(PSNRvalue)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(useEncryptionCheckBox)
+                            .addComponent(embedButton))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(embeddingPanelLayout.createSequentialGroup()
+                        .addComponent(selectImageButton)
+                        .addGap(263, 263, 263)
+                        .addComponent(jLabel9)
+                        .addGap(7, 7, 7)
+                        .addComponent(PSNRvalue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(saveStegoButton)))
                 .addContainerGap())
         );
         embeddingPanelLayout.setVerticalGroup(
@@ -192,7 +228,8 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addGroup(embeddingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(selectImageButton)
                     .addComponent(jLabel9)
-                    .addComponent(PSNRvalue))
+                    .addComponent(PSNRvalue)
+                    .addComponent(saveStegoButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -212,12 +249,12 @@ public class GUIStegano extends javax.swing.JFrame {
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(embeddingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jTextField5)
+                    .addComponent(stegoKeyTextField)
                     .addComponent(complexitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox1)
+                .addComponent(useEncryptionCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
+                .addComponent(embedButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -234,29 +271,52 @@ public class GUIStegano extends javax.swing.JFrame {
 
         inputStegoLabel.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel13.setText("Stego-key");
+        jLabel13.setText("Stego-key (max: 25 chars)");
 
-        jButton3.setText("Start Extracting");
+        stegoKeyExtractTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stegoKeyExtractTextFieldActionPerformed(evt);
+            }
+        });
+
+        extractButton.setText("Start Extracting");
+        extractButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                extractButtonActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Extracted message");
 
         jLabel3.setText("Decrypted message");
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
+        decryptedTextArea.setColumns(20);
+        decryptedTextArea.setRows(5);
+        jScrollPane2.setViewportView(decryptedTextArea);
 
-        jTextArea3.setColumns(20);
-        jTextArea3.setRows(5);
-        jScrollPane3.setViewportView(jTextArea3);
+        extractedTextArea.setColumns(20);
+        extractedTextArea.setRows(5);
+        jScrollPane3.setViewportView(extractedTextArea);
 
-        jButton2.setText("Decrypt message");
+        decryptButton.setText("Decrypt message");
+        decryptButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                decryptButtonActionPerformed(evt);
+            }
+        });
 
         jLabel16.setText("Extracted file");
 
         jLabel17.setText("Original :");
 
         jLabel18.setText("Decrypted :");
+
+        saveButton.setText("Save as..");
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout extractingPanelLayout = new javax.swing.GroupLayout(extractingPanel);
         extractingPanel.setLayout(extractingPanelLayout);
@@ -270,11 +330,13 @@ public class GUIStegano extends javax.swing.JFrame {
                             .addGroup(extractingPanelLayout.createSequentialGroup()
                                 .addComponent(selectStegoButton)
                                 .addGap(264, 264, 264)
-                                .addComponent(jButton2))
+                                .addComponent(decryptButton))
                             .addComponent(jLabel13)
-                            .addComponent(jTextField6))
+                            .addComponent(stegoKeyExtractTextField))
                         .addGap(18, 18, 18)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(extractingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(extractButton, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+                            .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(extractingPanelLayout.createSequentialGroup()
                         .addGroup(extractingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel10)
@@ -326,13 +388,14 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(extractingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(selectStegoButton)
-                    .addComponent(jButton2))
+                    .addComponent(decryptButton)
+                    .addComponent(saveButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(extractingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(stegoKeyExtractTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(extractButton, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(176, Short.MAX_VALUE))
         );
 
@@ -346,7 +409,7 @@ public class GUIStegano extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE)
+            .addComponent(jTabbedPane)
         );
 
         pack();
@@ -358,8 +421,8 @@ public class GUIStegano extends javax.swing.JFrame {
         fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
         int returnVal = fc.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            File file = fc.getSelectedFile();
-            fileHeaderLabel.setText(file.getName());
+            secretFile = fc.getSelectedFile();
+            fileHeaderLabel.setText(secretFile.getName());
         }
     }//GEN-LAST:event_selectFileButtonActionPerformed
 
@@ -390,6 +453,7 @@ public class GUIStegano extends javax.swing.JFrame {
             img = img.getScaledInstance(inputStegoLabel.getWidth(),inputStegoLabel.getHeight(), Image.SCALE_SMOOTH);
             ImageIcon newicon = new ImageIcon(img);
             inputStegoLabel.setIcon(newicon);
+            extractButton.setEnabled(true);
         }
     }//GEN-LAST:event_selectStegoButtonActionPerformed
 
@@ -408,6 +472,93 @@ public class GUIStegano extends javax.swing.JFrame {
         selectFileButton.setEnabled(true);
         fileHeaderLabel.setEnabled(true);
     }//GEN-LAST:event_inputFileRadioButtonActionPerformed
+
+    private void useEncryptionCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useEncryptionCheckBoxActionPerformed
+        useEncryption = !useEncryption;
+    }//GEN-LAST:event_useEncryptionCheckBoxActionPerformed
+
+    private void stegoKeyExtractTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stegoKeyExtractTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_stegoKeyExtractTextFieldActionPerformed
+
+    private void embedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_embedButtonActionPerformed
+        if((coverObjLabel.getIcon()!=null)&&(messageTextArea.getText().length()!=0||secretFile!=null)&&(stegoKeyTextField.getText().length()>0&&stegoKeyTextField.getText().length()<=25)) {
+            
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Input field haven't completed!");
+        }
+    }//GEN-LAST:event_embedButtonActionPerformed
+
+    private void extractButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractButtonActionPerformed
+        if(stegoKeyExtractTextField.getText().length()>0&&stegoKeyExtractTextField.getText().length()<=25) {
+            extractedTextArea.setEnabled(true);
+            extractedTextArea.setText("extracted");
+            extractedTextArea.setEditable(false);
+            decryptButton.setEnabled(true);
+            saveButton.setEnabled(true);
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Input field haven't completed!");
+        }
+    }//GEN-LAST:event_extractButtonActionPerformed
+
+    private void decryptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decryptButtonActionPerformed
+        if(extractedTextArea.isEnabled()) {
+            decryptedTextArea.setEnabled(true);
+            decryptedTextArea.setText(CipherTools.decryptVigenereExtended(extractedTextArea.getText(), stegoKeyExtractTextField.getText()));
+            decryptedTextArea.setEditable(false);
+        }
+    }//GEN-LAST:event_decryptButtonActionPerformed
+
+    private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+        if(extractedTextArea.isEnabled()) {
+            FileWriter fw = null;
+            try {
+                JFileChooser saveFile = new JFileChooser();
+                saveFile.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                saveFile.showSaveDialog(null);
+                fw = new FileWriter(saveFile.getSelectedFile());
+                if(decryptedTextArea.isEnabled())
+                    fw.write(decryptedTextArea.getText());
+                else
+                    fw.write(extractedTextArea.getText());
+            } catch (IOException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, "Error: Cannot save File!");
+            } finally {
+                try {
+                    fw.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        else {
+            try {
+                // save binary file
+                byte[] encrypted = new byte[8];
+                // BELOM KELAR
+                FileOutputStream outputStream;
+                if(decryptedFileHeaderLabel.getText()!=null)
+                    outputStream = new FileOutputStream(new File("data/message/"+decryptedFileHeaderLabel.getText()));
+                else
+                    outputStream = new FileOutputStream(new File("data/message/"+extractedFileHeaderLabel.getText()));
+                outputStream.write(encrypted);
+                outputStream.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_saveButtonActionPerformed
+
+    private void saveStegoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveStegoButtonActionPerformed
+        if(stegoObjLabel.getIcon()!=null) {
+            
+        }
+    }//GEN-LAST:event_saveStegoButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -448,18 +599,19 @@ public class GUIStegano extends javax.swing.JFrame {
     private javax.swing.JLabel PSNRvalue;
     private javax.swing.JSpinner complexitySpinner;
     private javax.swing.JLabel coverObjLabel;
+    private javax.swing.JButton decryptButton;
     private javax.swing.JLabel decryptedFileHeaderLabel;
+    private javax.swing.JTextArea decryptedTextArea;
+    private javax.swing.JButton embedButton;
     private javax.swing.JPanel embeddingPanel;
+    private javax.swing.JButton extractButton;
     private javax.swing.JLabel extractedFileHeaderLabel;
+    private javax.swing.JTextArea extractedTextArea;
     private javax.swing.JPanel extractingPanel;
     private javax.swing.JLabel fileHeaderLabel;
     private javax.swing.JRadioButton inputFileRadioButton;
     private javax.swing.JLabel inputStegoLabel;
     private javax.swing.JRadioButton inputTextRadioButton;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel13;
@@ -476,14 +628,15 @@ public class GUIStegano extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextArea jTextArea3;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField messageTextArea;
+    private javax.swing.JButton saveButton;
+    private javax.swing.JButton saveStegoButton;
     private javax.swing.JButton selectFileButton;
     private javax.swing.JButton selectImageButton;
     private javax.swing.JButton selectStegoButton;
+    private javax.swing.JTextField stegoKeyExtractTextField;
+    private javax.swing.JTextField stegoKeyTextField;
     private javax.swing.JLabel stegoObjLabel;
+    private javax.swing.JCheckBox useEncryptionCheckBox;
     // End of variables declaration//GEN-END:variables
 }

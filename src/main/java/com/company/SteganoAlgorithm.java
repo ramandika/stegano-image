@@ -535,5 +535,5 @@ public class SteganoAlgorithm {
         //TO BE IMPLEMENTED
         return null;
     }
-
+    
 }
