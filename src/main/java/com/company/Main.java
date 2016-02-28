@@ -74,6 +74,6 @@ public class Main {
 //        SteganoAlgorithm.he = 3;
 //        SteganoAlgorithm.convert8x8ToImage(a,7,5);
 
-        SteganoAlgorithm.insertText("gambar/flowers.bmp","saya anak baik","kriptografi");
+        SteganoAlgorithm.insertText("image.png","saya anak baik","kriptografi");
     }
 }

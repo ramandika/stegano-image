@@ -142,7 +142,7 @@ public class FuncTest {
         writer.close();
     }
 
-    public static void testXOR() throws Exception{
+/*    public static void testXOR() throws Exception{
         Scanner scanner = new Scanner(new File(fileName));
         int[] pixels=new int[row*col];
         int idx=0;
@@ -172,7 +172,7 @@ public class FuncTest {
             }
         }
         writer.close();
-    }
+    }*/
 
     public static void testIsComplexEnough(){
         final boolean T=true;

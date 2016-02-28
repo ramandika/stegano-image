@@ -27,6 +27,7 @@ public class SteganoAlgorithm {
             {T,F,T,F,T,F,T,F},
             {F,T,F,T,F,T,F,T},
             {T,F,T,F,T,F,T,F},
+
     };
     public static int wh;
     public static int he;
@@ -154,12 +155,34 @@ public class SteganoAlgorithm {
         return res;
     }
 
+    public static List<BitPlane> cgcToPBC(List<BitPlane> input){
+        int size=input.size();                                      // jumlah blok 8x8 dalam sebuah gambar
+        List<BitPlane> cgcres=new ArrayList();
+        for(int i=0;i<size;i++){
+            BitPlane temp=input.get(i);
+            BitPlane cgc=new BitPlane();
+            for(int a=0;a<temp.bp.size();a++){                      //layer [0,7]
+                boolean[][] bp8x8=temp.bp.get(a);                   //a=layer bp
+                boolean[][] res8x8=new boolean[M][N];
+                for(int x=0;x<M;x++)
+                    for(int y=0;y<N;y++){
+                        if(y==0) res8x8[x][y]=bp8x8[x][y];
+                        else{
+                            res8x8[x][y]=bp8x8[x][y]^res8x8[x][y-1];
+                        }
+                    }
+                cgc.bp.add(res8x8);
+            }
+            cgcres.add(cgc);
+        }
+        return cgcres;
+    }
     /**
      * converting from PBC to CGC system and vise versa
      * @param input
      * @return 
      */
-    public static List<BitPlane> XOR(List<BitPlane> input) {
+    public static List<BitPlane> pbcToCGC(List<BitPlane> input) {
         int size=input.size();                                      // jumlah blok 8x8 dalam sebuah gambar
         List<BitPlane> cgcres=new ArrayList();
         for(int i=0;i<size;i++){
@@ -309,9 +332,9 @@ public class SteganoAlgorithm {
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
         List<BitPlane> greenPBC = toPBC(bitplanes, 'G');
         List<BitPlane> bluePBC = toPBC(bitplanes, 'B');
-        List<BitPlane> redCGC = XOR(redPBC);
-        List<BitPlane> greenCGC = XOR(greenPBC);
-        List<BitPlane> blueCGC = XOR(bluePBC);
+        List<BitPlane> redCGC = pbcToCGC(redPBC);
+        List<BitPlane> greenCGC = pbcToCGC(greenPBC);
+        List<BitPlane> blueCGC = pbcToCGC(bluePBC);
         for(int i=0; i<redCGC.size(); i++) {                        // seluruh blok 8x8
             if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
                 for(int n=0; n<redCGC.get(i).bp.size(); n++) {      // 8 layer bit plane
@@ -384,9 +407,9 @@ public class SteganoAlgorithm {
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
         List<BitPlane> greenPBC = toPBC(bitplanes, 'G');
         List<BitPlane> bluePBC = toPBC(bitplanes, 'B');
-        List<BitPlane> redCGC = XOR(redPBC);
-        List<BitPlane> greenCGC = XOR(greenPBC);
-        List<BitPlane> blueCGC = XOR(bluePBC);
+        List<BitPlane> redCGC = pbcToCGC(redPBC);
+        List<BitPlane> greenCGC = pbcToCGC(greenPBC);
+        List<BitPlane> blueCGC = pbcToCGC(bluePBC);
 
         Map<Integer,List<Integer>> redComplex=getComplexPlanes(redCGC);
         Map<Integer,List<Integer>> greenComplex=getComplexPlanes(greenCGC);
@@ -449,9 +472,9 @@ public class SteganoAlgorithm {
 
         //Replace blueComplex
 
-        redPBC = XOR(redCGC);
-        greenPBC = XOR(greenCGC);
-        bluePBC = XOR(blueCGC);
+        redPBC = cgcToPBC(redCGC);
+        greenPBC = cgcToPBC(greenCGC);
+        bluePBC = cgcToPBC(blueCGC);
         
         // BALIKIN KE GAMBAR
         // MASIH BINGUNG
@@ -577,16 +600,16 @@ public class SteganoAlgorithm {
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
         List<BitPlane> greenPBC = toPBC(bitplanes, 'G');
         List<BitPlane> bluePBC = toPBC(bitplanes, 'B');
-        List<BitPlane> redCGC = XOR(redPBC);
-        List<BitPlane> greenCGC = XOR(greenPBC);
-        List<BitPlane> blueCGC = XOR(bluePBC);
+        List<BitPlane> redCGC = pbcToCGC(redPBC);
+        List<BitPlane> greenCGC = pbcToCGC(greenPBC);
+        List<BitPlane> blueCGC = pbcToCGC(bluePBC);
 
         Map<Integer,List<Integer>> redComplex=getComplexPlanes(redCGC);
         Map<Integer,List<Integer>> greenComplex=getComplexPlanes(greenCGC);
         Map<Integer,List<Integer>> blueComplex=getComplexPlanes(blueCGC);
         int seed=getSeedFromKey(key);
 
-        /*RED shuffle*/
+        //RED shuffle
         List keys = new ArrayList(redComplex.keySet());
         List templist;
         Collections.shuffle(keys,new Random(seed));
@@ -599,7 +622,7 @@ public class SteganoAlgorithm {
             redComplexShuf.add(p);
         }
 
-        /*Green Shuffle*/
+        //Green Shuffle
         keys=new ArrayList(greenComplex.keySet());
         templist=null;
         Collections.shuffle(keys,new Random(seed));
@@ -611,7 +634,7 @@ public class SteganoAlgorithm {
             Pair p = new Pair(o, greenComplex.get(o));
             greenComplexShuf.add(p);
         }
-        /*Blue shuffle*/
+        //Blue shuffle
         keys=new ArrayList(blueComplex.keySet());
         templist=null;
         List<Pair<Integer, List<Integer>>> blueComplexShuf=null;
@@ -670,11 +693,24 @@ public class SteganoAlgorithm {
                 }
             }
         }
-
-        redPBC = XOR(redCGC);
-        greenPBC = XOR(greenCGC);
-        bluePBC = XOR(blueCGC);
-        //System.out.println(redPBC.size()+" "+greenPBC.size()+" "+bluePBC.size());
+        redPBC=cgcToPBC(redCGC);
+        greenPBC=cgcToPBC(greenCGC);
+        bluePBC=cgcToPBC(blueCGC);
+/*        System.out.println("redPBC size :"+redPBC.size());
+        PrintWriter writer=new PrintWriter("pbccgcsuram.txt");
+        for(int idx=0;idx<redPBC.size();idx++){
+            writer.println("Posisi ke"+idx);
+            List<boolean[][]> temp=redPBC.get(idx).bp;
+            for(int idxs=0;idxs<temp.size();idxs++){
+                writer.println("Bit ke "+idxs);
+                for(int a=0;a<8;a++) {
+                    for (int b = 0; b < 8; b++)
+                        writer.print((temp.get(idxs)[a][b]?1:0) + " ");
+                    writer.println();
+                }
+            }
+            writer.close();
+        }*/
         List<List<BitPlane>> lbp=new ArrayList();
         lbp.add(redPBC); lbp.add(greenPBC);lbp.add(bluePBC);
         bitplanes=pbcTo8x8(lbp);
