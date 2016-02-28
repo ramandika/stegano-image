@@ -1,6 +1,7 @@
 package com.company;
 
 
+import com.company.Image.RGB;
 import javafx.util.Pair;
 
 import java.io.File;
@@ -16,7 +17,7 @@ public class SteganoAlgorithm {
     private static final boolean T=true;
     public static int M=8,N=8;               // M col N row
     private final static int max8x8changing=112;    // jumlah maksimal kemungkinan perubahan warna pada 8x8
-    private static double alpha=0.48;                    // default treshold
+    public static double alpha=0.48;                    // default treshold
     private static List<int[][]> bitplanes;         // kumpulan blok 8x8 sebuah gambar
     private static final boolean[][] chessBoard = {   // buat conjugate
             {F,T,F,T,F,T,F,T},
@@ -113,11 +114,7 @@ public class SteganoAlgorithm {
     public static int[] convert8x8ToPixels(List<int[][]> lb,int w,int h){
         int size=w*h;//,row,col,i8x8;
         int[] pixels=new int[size];
-        System.out.println("size:"+size);
-        System.out.println(w+" "+h);
-        System.out.println(wh+" "+he);
         for(int i=0;i<size;i++) {
-            //System.out.println((i % w) / M + (i / (M * w)) * wh);
             pixels[i] = lb.get((i % w) / M + (i / (M * w)) * wh)[(i / w) % M][(i % w) % N];
         }
         return pixels;
@@ -291,6 +288,8 @@ public class SteganoAlgorithm {
                     }
                 }
             }
+            if(isComplexEnough(messageMatrix))
+                messageMatrix = conjugate(messageMatrix);
             messageBitplane.add(messageMatrix);
         }
         return messageBitplane;
@@ -326,7 +325,7 @@ public class SteganoAlgorithm {
      * @param cipher
      * @return 
      */
-    public static int countPayloadByte(String imgPath, String cipher) {
+    public static int countPayloadByte(String imgPath) {
         int NbBit = 0;     // jumlah char yang dapat disisipkan pada gambar
         bitplanes = to8x8(new Image(imgPath));
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
@@ -587,10 +586,12 @@ public class SteganoAlgorithm {
 //
     }*/
 
-    public static void insertText(String imgPath, String message, String key) throws Exception {
+    public static Image insertText(String imgPath, String message, String key, boolean isEncrypted) throws Exception {
         int idxSeq = 0;
-        String cipher = CipherTools.encryptVigenereExtended(message, key);
-        List<Boolean> binaryMsg = convertMessageToBinary(cipher);
+        
+        if(isEncrypted)
+            message = CipherTools.encryptVigenereExtended(message, key);
+        List<Boolean> binaryMsg = convertMessageToBinary(message);
         List<boolean[][]> msgMatrix = new ArrayList();
         msgMatrix.add(convertIntToMatrix(0));                       // parameternya info size header, 0 karena bukan nyisipin file
         msgMatrix.add(convertIntToMatrix(message.length()));        // parameternya info size dr text yang akan di-embed
@@ -715,12 +716,37 @@ public class SteganoAlgorithm {
         lbp.add(redPBC); lbp.add(greenPBC);lbp.add(bluePBC);
         bitplanes=pbcTo8x8(lbp);
         image.setPixels(convert8x8ToPixels(bitplanes,image.getWidth(),image.getHeigth()));
-        image.saveImage("imagestegano.bmp");
+        return image;
     }
 
     public static String Extract(Image i,String key){
         //TO BE IMPLEMENTED
         return null;
+    }
+    
+    public static double countPSNR(Image cover, Image stego) {
+        double rms = 0.0;
+        double redRMS, greenRMS, blueRMS;
+        double squareDiff = 0.0;
+        RGB[] coverPixel = cover.getPixelsRGB();
+        RGB[] stegoPixel = stego.getPixelsRGB();
+        
+        for(int i=0; i<coverPixel.length; i++) {
+            squareDiff += Math.pow((coverPixel[i].getRed()-stegoPixel[i].getRed()), 2);
+        }
+        redRMS = Math.sqrt(squareDiff/coverPixel.length);
+        squareDiff = 0;
+        for(int i=0; i<coverPixel.length; i++) {
+            squareDiff += Math.pow((coverPixel[i].getGreen()-stegoPixel[i].getGreen()), 2);
+        }
+        greenRMS = Math.sqrt(squareDiff/coverPixel.length);
+        squareDiff = 0;
+        for(int i=0; i<coverPixel.length; i++) {
+            squareDiff += Math.pow((coverPixel[i].getBlue()-stegoPixel[i].getBlue()), 2);
+        }
+        blueRMS = Math.sqrt(squareDiff/coverPixel.length);
+        rms = (redRMS + greenRMS + blueRMS)/3;
+        return 20*Math.log10((double)256.0/rms);
     }
     
 }

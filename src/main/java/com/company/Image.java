@@ -46,6 +46,7 @@ public class Image {
             setWidth(image.getWidth());
             setHeigth(image.getHeight());
             setPixels(image.getRGB(0, 0, image.getWidth(), image.getHeight(), getPixels(), 0,image.getWidth()));
+            setPixelsRGB(convertToRGB());
         } catch (IOException ex) {
             Logger.getLogger(Image.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -112,10 +113,8 @@ public class Image {
     public void saveImage(String filename) throws IOException {
         BufferedImage bufferedImage = new BufferedImage(width, heigth, BufferedImage.TYPE_INT_RGB);
         bufferedImage.setRGB(0,0,width,heigth,pixels,0,width);
-        System.out.println(filename);
         File outputfile = new File(filename);
         String format=filename.substring(filename.indexOf('.')+1,filename.length());
         ImageIO.write(bufferedImage, format, outputfile);
-        System.out.println(format);
     }
 }
