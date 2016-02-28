@@ -1,6 +1,9 @@
 package com.company;
 
 
+import javafx.util.Pair;
+
+import java.text.CollationElementIterator;
 import java.util.*;
 
 /**
@@ -71,6 +74,35 @@ public class SteganoAlgorithm {
             }
         }
         return bitplanes;
+    }
+
+    public static List<int[][]> pbcTo8x8(List<List<BitPlane>> bitplanes){
+        List<int[][]> listPixels=null;
+        for(int i=0;i<bitplanes.size();i++){//bp[0]=red;bp[1]=green;bp[2]==blue
+            List<boolean[][]> listbool=bitplanes.get(i).get(i).bp;
+            int[][] pixels=null;
+            for(int j=0;j<listbool.size();j++){
+                if(i>0) pixels=listPixels.get(j);
+                else pixels=new int[8][8];
+                boolean[][] temp=listbool.get(j);
+                for(int a=0;a<8;a++)
+                    for(int b=0;b<8;b++)
+                        pixels[a][b]+=((temp[a][b]? 1:0) <<(8*(2-i)+j)); //redd slide 16+j, green slide 8+j, blue slide j
+            }
+            listPixels.add(pixels);
+        }
+        return listPixels;
+    }
+
+    public static Image convert8x8ToImage(List<int[][]> lb,int w,int h){
+        int size=w*h,row,col,i8x8;
+        int[] pixels=new int[size];
+        for(int i=0;i<size;i++){
+            i8x8=i/wh;
+            row=i/wh;
+            col=i/he;
+            pixels[i]=lb.get(i8x8)[row][col];
+        }
     }
     
     /**
@@ -165,9 +197,11 @@ public class SteganoAlgorithm {
      */
     public static boolean[][] conjugate(boolean[][] input){            // convert bit pesan ke dalam bentuk yang lebih kompleks
         boolean[][] boolres=new boolean[M][N];
+
         for(int i=0;i<N;i++)
             for(int j=0;j<M;j++)
                 boolres[i][j]=input[i][j]^chessBoard[i][j];
+        boolres[0][0]=true; //Flag conjugated
         return boolres;
     }
     
@@ -225,15 +259,26 @@ public class SteganoAlgorithm {
     }
     
     // INI GUE MASIH BINGUNG GIMANA NGECONVERTNYA, TOLONG KERJAIN YA.. :V
-    static boolean[][] convertIntToMatrix(int num) {
-        boolean[][] matrix = new boolean[8][8];
+    static boolean[][] convertIntToMatrix(long num) throws Exception {
+        boolean[][] matrix;
         byte[] byteNum = new byte[8];
-        for(int i=0; i<8; i++) {
-            byteNum[i] = (byte) ((num >> 7-i) & 0xff);
-            for(int j=0; j<8; j++) {
-                
+        if(num < 0) throw new Exception("Bit overflow > 63 bit");
+        else{
+            matrix = new boolean[8][8];
+            for(int i=0; i<8; i++) {
+                byteNum[i] = (byte) (num >> 8*(7-i));
             }
+            for(int a=0;a<8;a++)
+                for (int b = 0; b < 8; b++) {
+                    matrix[a][b] = (((byteNum[a] >> (7 - b)) & 1) != 0);
+                }
         }
+/*        matrix[0][0]=false;
+        for(int i=0;i<8;i++) {
+            for (int j = 0; j < 8; j++)
+                System.out.print((matrix[i][j]?1:0) + " ");
+            System.out.println();
+        }*/
         return matrix;
     }
     
@@ -298,8 +343,20 @@ public class SteganoAlgorithm {
         }
         return messageBitplane;
     }
+
+    private static Map<Integer,List<Integer>> getComplexPlanes(List<BitPlane> bitplanes) throws Exception{
+        Map<Integer,List<Integer>> map=new HashMap();
+        for(int i=0;i<bitplanes.size();i++){
+            List<boolean[][]> bp=bitplanes.get(i).bp;
+            List<Integer> bitComplex=new ArrayList();
+            for(int bit=0;bit<bp.size();bit++) // [0..7] bit
+                if(isComplexEnough(bp.get(bit)))bitComplex.add(bit);
+            map.put(i,bitComplex);
+        }
+        return map;
+    }
     
-    public static Image insertFile(String imgPath, String headerFile, byte[] binaryFile, String key) {
+    public static Image insertFile(String imgPath, String headerFile, byte[] binaryFile, String key) throws Exception{
         int idxSeq = -1;
         byte[] cipher = CipherTools.encryptFileVigenere(binaryFile, key);
         List<Boolean> binaryMsg = binaryToListBoolean(cipher);
@@ -307,7 +364,6 @@ public class SteganoAlgorithm {
         msgMatrix.add(convertIntToMatrix(headerFile.length()));                       // parameternya info size header, 0 karena bukan nyisipin file
         msgMatrix.add(convertIntToMatrix(binaryFile.length));                         // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
-        List<Integer> randSeq = getUniqRandSeq(getSeedFromKey(key), msgMatrix.size());
         
         bitplanes = to8x8(new Image(imgPath));
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
@@ -316,57 +372,67 @@ public class SteganoAlgorithm {
         List<BitPlane> redCGC = XOR(redPBC);
         List<BitPlane> greenCGC = XOR(greenPBC);
         List<BitPlane> blueCGC = XOR(bluePBC);
-        for(int i=0; i<redCGC.size(); i++) {                        // seluruh blok 8x8
-            if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
-                for(int j=0; j<redCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
-                    if(isComplexEnough(redCGC.get(i).bp.get(j))) {
-                        idxSeq++;
-                        if(randSeq.contains(idxSeq)) {
-                            if(isComplexEnough(msgMatrix.get(randSeq.indexOf(idxSeq)))) {
-                                redCGC.get(i).bp.set(j, msgMatrix.get(randSeq.indexOf(idxSeq)));
-                            }
-                            else {
-                                redCGC.get(i).bp.set(j, conjugate(msgMatrix.get(randSeq.indexOf(idxSeq))));
-                            }
-                        }
-                    }
+
+        Map<Integer,List<Integer>> redComplex=getComplexPlanes(redCGC);
+        Map<Integer,List<Integer>> greenComplex=getComplexPlanes(greenCGC);
+        Map<Integer,List<Integer>> blueComplex=getComplexPlanes(blueCGC);
+        int seed=getSeedFromKey(key);
+
+        /*RED shuffle*/
+        List keys = new ArrayList(redComplex.keySet());
+        List templist;
+        Collections.shuffle(keys,new Random(seed));
+        List<Pair<Integer, List<Integer>>> redComplexShuf=null;
+        for (Object o : keys) {
+            redComplexShuf = new ArrayList();
+            templist=redComplex.get(o);
+            if(templist!=null)Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, redComplex.get(o));
+            redComplexShuf.add(p);
+        }
+
+        /*Green Shuffle*/
+        keys=new ArrayList(greenComplex.keySet());
+        List<Pair<Integer, List<Integer>>> greenComplexShuf=null;
+        Collections.shuffle(keys,new Random(seed));
+        for (Object o : keys) {
+            greenComplexShuf = new ArrayList();
+            templist=greenComplex.get(o);
+            Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, greenComplex.get(o));
+            greenComplexShuf.add(p);
+        }
+        /*Blue shuffle*/
+        keys=new ArrayList(blueComplex.keySet());
+        List<Pair<Integer, List<Integer>>> blueComplexShuf=null;
+        Collections.shuffle(keys,new Random(seed));
+        for (Object o : keys) {
+            blueComplexShuf = new ArrayList();
+            templist=blueComplex.get(o);
+            Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, blueComplex.get(o));
+            blueComplexShuf.add(p);
+        }
+
+        //Replace redComplex
+        for(int i=0;i<redComplexShuf.size();i++){
+            Pair<Integer,List<Integer>> temp=redComplexShuf.get(i);
+            int pos= temp.getKey();
+            List<Integer> bits=temp.getValue();
+            if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
+                for(int j=0;i<bits.size();j++){
+                    boolean[][] imgbool=redCGC.get(pos).bp.get(j);
+                    idxSeq++;
+                    for(int a=0;a<8;a++)
+                        for(int b=0;b<8;b++)
+                            imgbool[a][b]=messageBlock.get(idxSeq)[a][b];
                 }
             }
         }
-        for(int i=0; i<greenCGC.size(); i++) {                        // seluruh blok 8x8
-            if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
-                for(int j=0; j<greenCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
-                    if(isComplexEnough(greenCGC.get(i).bp.get(j))) {
-                        idxSeq++;
-                        if(randSeq.contains(idxSeq)) {
-                            if(isComplexEnough(msgMatrix.get(randSeq.indexOf(idxSeq)))) {
-                                greenCGC.get(i).bp.set(j, msgMatrix.get(randSeq.indexOf(idxSeq)));
-                            }
-                            else {
-                                greenCGC.get(i).bp.set(j, conjugate(msgMatrix.get(randSeq.indexOf(idxSeq))));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        for(int i=0; i<blueCGC.size(); i++) {                        // seluruh blok 8x8
-            if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
-                for(int j=0; j<blueCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
-                    if(isComplexEnough(blueCGC.get(i).bp.get(j))) {
-                        idxSeq++;
-                        if(randSeq.contains(idxSeq)) {
-                            if(isComplexEnough(msgMatrix.get(randSeq.indexOf(idxSeq)))) {
-                                blueCGC.get(i).bp.set(j, msgMatrix.get(randSeq.indexOf(idxSeq)));
-                            }
-                            else {
-                                blueCGC.get(i).bp.set(j, conjugate(msgMatrix.get(randSeq.indexOf(idxSeq))));
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //Replace greenComplex
+
+        //Replace blueComplex
+
         redPBC = XOR(redCGC);
         greenPBC = XOR(greenCGC);
         bluePBC = XOR(blueCGC);
@@ -378,7 +444,7 @@ public class SteganoAlgorithm {
         return null;
     }
     
-    public static Image insertText(String imgPath, String message, String key) {
+    public static Image insertText(String imgPath, String message, String key) throws Exception {
         int idxSeq = -1;
         String cipher = CipherTools.encryptVigenereExtended(message, key);
         List<Boolean> binaryMsg = convertMessageToBinary(cipher);
@@ -386,7 +452,6 @@ public class SteganoAlgorithm {
         msgMatrix.add(convertIntToMatrix(0));                       // parameternya info size header, 0 karena bukan nyisipin file
         msgMatrix.add(convertIntToMatrix(message.length()));        // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
-        List<Integer> randSeq = getUniqRandSeq(getSeedFromKey(key), msgMatrix.size());
         
         bitplanes = to8x8(new Image(imgPath));
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
@@ -395,6 +460,15 @@ public class SteganoAlgorithm {
         List<BitPlane> redCGC = XOR(redPBC);
         List<BitPlane> greenCGC = XOR(greenPBC);
         List<BitPlane> blueCGC = XOR(bluePBC);
+
+        Map<Integer,List<Integer>> redComplex=getComplexPlanes(redCGC);
+        Map<Integer,List<Integer>> greenComplex=getComplexPlanes(greenCGC);
+        Map<Integer,List<Integer>> blueComplex=getComplexPlanes(blueCGC);
+        int seed=getSeedFromKey(key);
+        Collections.shuffle(redComplex, new Random(seed));
+        Collections.shuffle(greenComplex,new Random(seed));
+        Collections.shuffle(blueComplex,new Random(seed));
+
         for(int i=0; i<redCGC.size(); i++) {                        // seluruh blok 8x8
             if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
                 for(int j=0; j<redCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
@@ -412,7 +486,7 @@ public class SteganoAlgorithm {
                 }
             }
         }
-        for(int i=0; i<greenCGC.size(); i++) {                        // seluruh blok 8x8
+/*        for(int i=0; i<greenCGC.size(); i++) {                        // seluruh blok 8x8
             if(((i+1)%wh!=0)&&((i/wh)!=he-1)) {
                 for(int j=0; j<greenCGC.get(i).bp.size(); j++) {      // 8 layer bit plane
                     if(isComplexEnough(greenCGC.get(i).bp.get(j))) {
@@ -445,7 +519,7 @@ public class SteganoAlgorithm {
                     }
                 }
             }
-        }
+        }*/
         redPBC = XOR(redCGC);
         greenPBC = XOR(greenCGC);
         bluePBC = XOR(blueCGC);
@@ -455,14 +529,6 @@ public class SteganoAlgorithm {
         // TOLONG LANJUTIN YEEE
         
         return null;
-    }
-
-    static List<Integer> getUniqRandSeq(int seed, int size){
-        List<Integer> list=new ArrayList();
-        for(int i=0;i<size;i++)
-            list.add(i);
-        Collections.shuffle(list, new Random(seed));
-        return list;
     }
 
     public static String Extract(Image i,String key){
