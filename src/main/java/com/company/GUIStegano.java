@@ -21,7 +21,9 @@ public class GUIStegano extends javax.swing.JFrame {
      * Creates new form GUIStegano
      */
     public GUIStegano() {
+        super("Stegano-tools");
         initComponents();
+        this.setResizable(false);
         inputTextRadioButton.setSelected(true);
         selectFileButton.setEnabled(false);
         SpinnerNumberModel model = new SpinnerNumberModel(0.3, 0.09, 0.50, 0.05);
@@ -216,7 +218,7 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addComponent(jCheckBox1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Embedding", embeddingPanel);
@@ -331,7 +333,7 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addGroup(extractingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(199, Short.MAX_VALUE))
+                .addContainerGap(176, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Extracting", extractingPanel);
@@ -344,7 +346,7 @@ public class GUIStegano extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane)
+            .addComponent(jTabbedPane, javax.swing.GroupLayout.DEFAULT_SIZE, 622, Short.MAX_VALUE)
         );
 
         pack();
