@@ -8,6 +8,7 @@ package com.company;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -513,21 +514,12 @@ public class GUIStegano extends javax.swing.JFrame {
 
     private void embedButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_embedButtonActionPerformed
         if((coverObjLabel.getIcon()!=null)&&(messageTextArea.getText().length()!=0||secretFile!=null)&&(stegoKeyTextField.getText().length()>0&&stegoKeyTextField.getText().length()<=25)) {
-            if(inputTextRadioButton.isSelected()) {
+            SteganoAlgorithm.alpha = (Double) complexitySpinner.getValue();
+            if(inputTextRadioButton.isSelected()) {     // input berupa teks biasa
                 if(messageTextArea.getText().length()<=SteganoAlgorithm.countPayloadByte(imgFilePath)) {
                     try {
-                        SteganoAlgorithm.alpha = (Double) complexitySpinner.getValue();
-                        System.out.println(SteganoAlgorithm.alpha);
+                        //System.out.println(SteganoAlgorithm.alpha);
                         stegoImg = SteganoAlgorithm.insertText(imgFilePath, messageTextArea.getText(), stegoKeyTextField.getText(), useEncryption);
-                        BufferedImage bufferedImage = new BufferedImage(stegoImg.getWidth(), stegoImg.getHeigth(), BufferedImage.TYPE_INT_RGB);
-                        bufferedImage.setRGB(0,0,stegoImg.getWidth(),stegoImg.getHeigth(),stegoImg.getPixels(),0,stegoImg.getWidth());
-                        ImageIcon icon = new ImageIcon(bufferedImage);
-                        Image img = icon.getImage();
-                        img = img.getScaledInstance(stegoObjLabel.getWidth(),stegoObjLabel.getHeight(), Image.SCALE_SMOOTH);
-                        ImageIcon newicon = new ImageIcon(img);
-                        stegoObjLabel.setIcon(newicon);
-                        com.company.Image image=new com.company.Image(imgFilePath);
-                        PSNRvalue.setText(String.valueOf(SteganoAlgorithm.countPSNR(image, stegoImg)));
                     } catch (Exception ex) {
                         Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -535,6 +527,38 @@ public class GUIStegano extends javax.swing.JFrame {
                 else
                     JOptionPane.showMessageDialog(this, "Secret message over payload! ("+SteganoAlgorithm.countPayloadByte(imgFilePath)+"bytes)");
             }
+            else {                      FileInputStream in = null;
+                try {
+                    // input pesan rahasia berupa file
+                    String headerFile = secretFile.getName();
+                    byte[] fileData = new byte[(int) secretFile.length()];
+                    in = new FileInputStream(secretFile);
+                    in.read(fileData);
+                    stegoImg = SteganoAlgorithm.insertFile(imgFilePath, headerFile, fileData, stegoKeyTextField.getText(), useEncryption);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                    Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            stegoImg.setPixelsRGB(stegoImg.convertToRGB());
+            BufferedImage bufferedImage = new BufferedImage(stegoImg.getWidth(), stegoImg.getHeigth(), BufferedImage.TYPE_INT_RGB);
+            bufferedImage.setRGB(0,0,stegoImg.getWidth(),stegoImg.getHeigth(),stegoImg.getPixels(),0,stegoImg.getWidth());
+            ImageIcon icon = new ImageIcon(bufferedImage);
+            Image img = icon.getImage();
+            img = img.getScaledInstance(stegoObjLabel.getWidth(),stegoObjLabel.getHeight(), Image.SCALE_SMOOTH);
+            ImageIcon newicon = new ImageIcon(img);
+            stegoObjLabel.setIcon(newicon);
+            com.company.Image image=new com.company.Image(imgFilePath);
+            PSNRvalue.setText(String.valueOf(SteganoAlgorithm.countPSNR(image, stegoImg)));
         }
         else {
             JOptionPane.showMessageDialog(this, "Input field haven't completed!");

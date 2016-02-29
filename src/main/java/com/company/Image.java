@@ -41,7 +41,7 @@ public class Image {
     }
     public Image(String path) {
         try {
-            System.out.println(path);
+            //System.out.println(path);
             BufferedImage image = ImageIO.read(new FileInputStream(path));
             setWidth(image.getWidth());
             setHeigth(image.getHeight());
