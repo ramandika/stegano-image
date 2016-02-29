@@ -511,10 +511,10 @@ public class SteganoAlgorithm {
         image.setPixels(convert8x8ToPixels(bitplanes,image.getWidth(),image.getHeigth()));
         return image;
     }
-    
-    public static Image insertText(String imgPath, String message, String key, boolean isEncrypted) throws Exception {
+
+
+    public static Image insertText(String imgPath, String message, String key,boolean isEncrypted) throws Exception {
         int idxSeq = 0;
-        
         if(isEncrypted)
             message = CipherTools.encryptVigenereExtended(message, key);
         List<Boolean> binaryMsg = convertMessageToBinary(message);
@@ -629,7 +629,7 @@ public class SteganoAlgorithm {
         image.setPixels(convert8x8ToPixels(bitplanes,image.getWidth(),image.getHeigth()));
         return image;
     }
-    
+
     public static String getFileHeader(int headerSize, int bodySize, List<Boolean> binary) {
         String header = "";
         byte data = 0;
@@ -641,7 +641,7 @@ public class SteganoAlgorithm {
         }
         return header;
     }
-    
+
     public static byte[] getContent(int headerSize, int bodySize, List<Boolean> binary) {
         byte[] data = new byte[bodySize];
         for(int i=0; i<bodySize; i++) {
@@ -653,18 +653,104 @@ public class SteganoAlgorithm {
         return data;
     }
 
-    public static String Extract(Image i,String key){
-        //TO BE IMPLEMENTED
-        return null;
+    public static void Extract(String imgPath,String key) throws Exception {
+        int idxSeq = 0;
+        Image image = new Image(imgPath);
+        bitplanes = to8x8(image);
+        List<BitPlane> redPBC = toPBC(bitplanes, 'R');
+        List<BitPlane> greenPBC = toPBC(bitplanes, 'G');
+        List<BitPlane> bluePBC = toPBC(bitplanes, 'B');
+        List<BitPlane> redCGC = pbcToCGC(redPBC);
+        List<BitPlane> greenCGC = pbcToCGC(greenPBC);
+        List<BitPlane> blueCGC = pbcToCGC(bluePBC);
+
+        Map<Integer, List<Integer>> redComplex = getComplexPlanes(redCGC);
+        Map<Integer, List<Integer>> greenComplex = getComplexPlanes(greenCGC);
+        Map<Integer, List<Integer>> blueComplex = getComplexPlanes(blueCGC);
+        int seed = getSeedFromKey(key);
+
+        //RED shuffle
+        List keys = new ArrayList(redComplex.keySet());
+        List templist;
+        Collections.shuffle(keys, new Random(seed));
+        List<Pair<Integer, List<Integer>>> redComplexShuf = null;
+        for (Object o : keys) {
+            redComplexShuf = new ArrayList();
+            templist = redComplex.get(o);
+            if (templist != null) Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, redComplex.get(o));
+            redComplexShuf.add(p);
+        }
+
+        //Green Shuffle
+        keys = new ArrayList(greenComplex.keySet());
+        templist = null;
+        Collections.shuffle(keys, new Random(seed));
+        List<Pair<Integer, List<Integer>>> greenComplexShuf = null;
+        for (Object o : keys) {
+            greenComplexShuf = new ArrayList();
+            templist = greenComplex.get(o);
+            if (templist != null) Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, greenComplex.get(o));
+            greenComplexShuf.add(p);
+        }
+        //Blue shuffle
+        keys = new ArrayList(blueComplex.keySet());
+        templist = null;
+        List<Pair<Integer, List<Integer>>> blueComplexShuf = null;
+        Collections.shuffle(keys, new Random(seed));
+        for (Object o : keys) {
+            blueComplexShuf = new ArrayList();
+            templist = blueComplex.get(o);
+            if (templist != null) Collections.shuffle(templist, new Random(seed));
+            Pair p = new Pair(o, blueComplex.get(o));
+            blueComplexShuf.add(p);
+        }
+
+        int counter = 0;
+        long headerSize = 0;
+        long bodySize = 0;
+        long bit = 0x7FFFFFFF;
+        List<Boolean> messages = new ArrayList();
+        //Extract redComplex
+        for (int i = 0; i < greenComplexShuf.size() && bit > 0; i++) {
+            Pair<Integer, List<Integer>> temp = greenComplexShuf.get(i);
+            int pos = temp.getKey();
+            List<Integer> bits = temp.getValue();
+            if (((pos + 1) % wh != 0) && ((pos / wh) != he - 1))
+                for (int j = 0; j < bits.size() && bit > 0; j++) {
+                    boolean[][] imgbool = redCGC.get(pos).bp.get(bits.get(j));
+                    if (counter == 0) headerSize = boolToInt(imgbool); //size+headerinfo
+                    else if (counter == 1) {
+                        bodySize = boolToInt(imgbool);
+                        bit = (headerSize + bodySize) * 8;
+                    } else {
+                        if (imgbool[0][0]) {
+                            imgbool = conjugate(imgbool);
+                        }
+                        for (int a = 0; a < 8; a++)
+                            for (int b = 0; b < 8; b++)
+                                if (a != 0 && b != 0) {
+                                    messages.add(imgbool[a][b]);
+                                    bit--;
+                                }
+                    }
+
+                }
+        }
+        for(int i=0;i<messages.size();i++){
+            System.out.print(messages.get(i));
+        }
+
     }
-    
+
     public static double countPSNR(Image cover, Image stego) {
         double rms = 0.0;
         double redRMS, greenRMS, blueRMS;
         double squareDiff = 0.0;
         RGB[] coverPixel = cover.getPixelsRGB();
         RGB[] stegoPixel = stego.getPixelsRGB();
-        
+
         for(int i=0; i<coverPixel.length; i++) {
             squareDiff += Math.pow((coverPixel[i].getRed()-stegoPixel[i].getRed()), 2);
         }
@@ -682,5 +768,19 @@ public class SteganoAlgorithm {
         rms = (redRMS + greenRMS + blueRMS)/3;
         return 20*Math.log10((double)256.0/rms);
     }
-    
+
+
+    public static long boolToInt(boolean[][] boolimg){
+        long a = 0L;
+        for(int i =0;i<8;i++){
+            for(int j = 0;j<8;j++){
+                if(i!= 0 || j!= 0){
+                    a+=((long)((boolimg[i][j]) ? 1:0) << 63-(j+8*i));
+
+                }
+            }
+        }
+        return a;
+    }
+
 }
