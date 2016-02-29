@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -476,6 +477,9 @@ public class GUIStegano extends javax.swing.JFrame {
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             try {
                 File imgfile = fc.getSelectedFile();
+                imgFilePath = imgfile.getPath();
+                stegoImg = new com.company.Image(imgFilePath);
+                stegoImg.setPixelsRGB(stegoImg.getPixelsRGB());
                 ImageIcon icon = new ImageIcon(ImageIO.read(imgfile));
                 Image img = icon.getImage();
                 img = img.getScaledInstance(inputStegoLabel.getWidth(),inputStegoLabel.getHeight(), Image.SCALE_SMOOTH);
@@ -567,12 +571,23 @@ public class GUIStegano extends javax.swing.JFrame {
 
     private void extractButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractButtonActionPerformed
         if(stegoKeyExtractTextField.getText().length()>0&&stegoKeyExtractTextField.getText().length()<=25) {
-            extractedTextArea.setEnabled(true);
-            extractedTextArea.setText("extracted");
-            extractedTextArea.setEditable(false);
-            decryptButton.setEnabled(true);
-            saveButton.setEnabled(true);
-            SteganoAlgorithm.alpha = (Double) extractComplexitySpinner.getValue();
+            try {
+                decryptButton.setEnabled(true);
+                saveButton.setEnabled(true);
+                SteganoAlgorithm.alpha = (Double) extractComplexitySpinner.getValue();
+                List<Boolean> bodyFile = SteganoAlgorithm.Extract(imgFilePath, stegoKeyExtractTextField.getText());
+                System.out.println("bodyFile size:"+bodyFile.size());
+                if(SteganoAlgorithm.extractedHeaderSize==0) {
+                    extractedTextArea.setEnabled(true);
+                    extractedTextArea.setEditable(false);
+                    extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
+                }
+                else {
+                    extractedFileHeaderLabel.setText(SteganoAlgorithm.getFileHeader(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile));
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         else {
             JOptionPane.showMessageDialog(this, "Input field haven't completed!");

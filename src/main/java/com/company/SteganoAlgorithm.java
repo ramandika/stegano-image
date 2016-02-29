@@ -33,6 +33,8 @@ public class SteganoAlgorithm {
     public static int wh;
     public static int he;
     private static List<boolean[][]> messageBlock;
+    public static long extractedHeaderSize;
+    public static long extractedBodySize;
     public static class BitPlane {// 8 bit plane utk 1 blok dengan
         public BitPlane(){
             bp=new ArrayList();
@@ -630,7 +632,7 @@ public class SteganoAlgorithm {
         return image;
     }
 
-    public static String getFileHeader(int headerSize, int bodySize, List<Boolean> binary) {
+    public static String getFileHeader(long headerSize, long bodySize, List<Boolean> binary) {
         String header = "";
         byte data = 0;
         for(int i=0; i<headerSize; i++) {
@@ -642,8 +644,8 @@ public class SteganoAlgorithm {
         return header;
     }
 
-    public static byte[] getContent(int headerSize, int bodySize, List<Boolean> binary) {
-        byte[] data = new byte[bodySize];
+    public static byte[] getContent(long headerSize, long bodySize, List<Boolean> binary) {
+        byte[] data = new byte[(int)bodySize];
         for(int i=0; i<bodySize; i++) {
             data[i] = 0;
             for(int j=0; j<8; j++) {
@@ -653,7 +655,7 @@ public class SteganoAlgorithm {
         return data;
     }
 
-    public static void Extract(String imgPath,String key) throws Exception {
+    public static List<Boolean> Extract(String imgPath,String key) throws Exception {
         int idxSeq = 0;
         Image image = new Image(imgPath);
         bitplanes = to8x8(image);
@@ -708,8 +710,8 @@ public class SteganoAlgorithm {
         }
 
         int counter = 0;
-        long headerSize = 0;
-        long bodySize = 0;
+        extractedHeaderSize = 0;
+        extractedBodySize = 0;
         long bit = 0x7FFFFFFF;
         List<Boolean> messages = new ArrayList();
         //Extract redComplex
@@ -720,17 +722,19 @@ public class SteganoAlgorithm {
             if (((pos + 1) % wh != 0) && ((pos / wh) != he - 1))
                 for (int j = 0; j < bits.size() && bit > 0; j++) {
                     boolean[][] imgbool = redCGC.get(pos).bp.get(bits.get(j));
-                    if (counter == 0) headerSize = boolToInt(imgbool); //size+headerinfo
+                    if (counter == 0) extractedHeaderSize = boolToInt(imgbool); //size+headerinfo
                     else if (counter == 1) {
-                        bodySize = boolToInt(imgbool);
-                        bit = (headerSize + bodySize) * 8;
+                        extractedBodySize = boolToInt(imgbool);
+                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
+                        bit = (extractedHeaderSize + extractedBodySize) * 8;
                     } else {
                         if (imgbool[0][0]) {
                             imgbool = conjugate(imgbool);
                         }
                         for (int a = 0; a < 8; a++)
                             for (int b = 0; b < 8; b++)
-                                if (a != 0 && b != 0) {
+                                if (a != 0 || b != 0) {
+                                    System.out.println("adding bit");
                                     messages.add(imgbool[a][b]);
                                     bit--;
                                 }
@@ -741,7 +745,7 @@ public class SteganoAlgorithm {
         for(int i=0;i<messages.size();i++){
             System.out.print(messages.get(i));
         }
-
+        return messages;
     }
 
     public static double countPSNR(Image cover, Image stego) {
