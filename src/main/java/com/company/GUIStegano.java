@@ -572,6 +572,7 @@ public class GUIStegano extends javax.swing.JFrame {
             extractedTextArea.setEditable(false);
             decryptButton.setEnabled(true);
             saveButton.setEnabled(true);
+            SteganoAlgorithm.alpha = (Double) extractComplexitySpinner.getValue();
         }
         else {
             JOptionPane.showMessageDialog(this, "Input field haven't completed!");
@@ -583,6 +584,9 @@ public class GUIStegano extends javax.swing.JFrame {
             decryptedTextArea.setEnabled(true);
             decryptedTextArea.setText(CipherTools.decryptVigenereExtended(extractedTextArea.getText(), stegoKeyExtractTextField.getText()));
             decryptedTextArea.setEditable(false);
+        }
+        else {
+            
         }
     }//GEN-LAST:event_decryptButtonActionPerformed
 

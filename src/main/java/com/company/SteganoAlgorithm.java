@@ -629,6 +629,29 @@ public class SteganoAlgorithm {
         image.setPixels(convert8x8ToPixels(bitplanes,image.getWidth(),image.getHeigth()));
         return image;
     }
+    
+    public static String getFileHeader(int headerSize, int bodySize, List<Boolean> binary) {
+        String header = "";
+        byte data = 0;
+        for(int i=0; i<headerSize; i++) {
+            for(int j=0; j<8; j++) {
+                data += binary.get(i*8+j)? 1:0 << 7-j;
+            }
+            header.concat(""+(char)data);
+        }
+        return header;
+    }
+    
+    public static byte[] getContent(int headerSize, int bodySize, List<Boolean> binary) {
+        byte[] data = new byte[bodySize];
+        for(int i=0; i<bodySize; i++) {
+            data[i] = 0;
+            for(int j=0; j<8; j++) {
+                data[i] += binary.get(i*8+j)? 1:0 << 7-j;
+            }
+        }
+        return data;
+    }
 
     public static String Extract(Image i,String key){
         //TO BE IMPLEMENTED
