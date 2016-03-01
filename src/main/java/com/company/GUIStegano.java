@@ -234,7 +234,7 @@ public class GUIStegano extends javax.swing.JFrame {
                         .addComponent(coverObjLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(embeddingPanelLayout.createSequentialGroup()
                         .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(stegoObjLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(embeddingPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -267,7 +267,7 @@ public class GUIStegano extends javax.swing.JFrame {
                 .addComponent(useEncryptionCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(embedButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jTabbedPane.addTab("Embedding", embeddingPanel);
@@ -583,7 +583,8 @@ public class GUIStegano extends javax.swing.JFrame {
                     extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
                 }
                 else {
-                    extractedFileHeaderLabel.setText(SteganoAlgorithm.getFileHeader(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile));
+                     extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
+                    extractedFileHeaderLabel.setText(new String(SteganoAlgorithm.getFileHeader(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
                 }
             } catch (Exception ex) {
                 Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
@@ -709,7 +710,7 @@ public class GUIStegano extends javax.swing.JFrame {
     private javax.swing.JButton extractButton;
     private javax.swing.JSpinner extractComplexitySpinner;
     private javax.swing.JLabel extractedFileHeaderLabel;
-    private javax.swing.JTextArea extractedTextArea;
+    public javax.swing.JTextArea extractedTextArea;
     private javax.swing.JPanel extractingPanel;
     private javax.swing.JLabel fileHeaderLabel;
     private javax.swing.JRadioButton inputFileRadioButton;
