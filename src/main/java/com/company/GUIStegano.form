@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
-=======
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
->>>>>>> perbaikan khilaf
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
   </Properties>
@@ -118,11 +114,7 @@
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                      <EmptySpace max="-2" attributes="0"/>
-=======
                       <EmptySpace min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
@@ -131,43 +123,25 @@
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="stegoObjLabel" min="-2" pref="296" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-=======
                               <EmptySpace max="32767" attributes="0"/>
                               <Component id="stegoObjLabel" min="-2" pref="296" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="selectImageButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="PSNRvalue" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="saveStegoButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-=======
                       <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="inputFileRadioButton" alignment="1" min="-2" max="-2" attributes="0"/>
                           <Component id="inputTextRadioButton" min="-2" max="-2" attributes="0"/>
                       </Group>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                      <EmptySpace max="-2" attributes="0"/>
-=======
                       <EmptySpace min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="messageTextArea" min="-2" pref="58" max="-2" attributes="0"/>
                           <Group type="102" attributes="0">
@@ -176,37 +150,21 @@
                               <Component id="fileHeaderLabel" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-=======
                       <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                      <EmptySpace max="-2" attributes="0"/>
-=======
                       <EmptySpace min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="stegoKeyTextField" max="32767" attributes="0"/>
                           <Component id="complexitySpinner" min="-2" pref="31" max="-2" attributes="0"/>
                       </Group>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="useEncryptionCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="embedButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-=======
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="useEncryptionCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                       <Component id="embedButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
->>>>>>> perbaikan khilaf
                   </Group>
               </Group>
             </DimensionLayout>
@@ -522,12 +480,9 @@
                     <Property name="columns" type="int" value="20"/>
                     <Property name="rows" type="int" value="5"/>
                   </Properties>
-<<<<<<< 8d1bc6b5ae0d55d4862b6f5cde7d4f7ea31fad47
-=======
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
                   </AuxValues>
->>>>>>> perbaikan khilaf
                 </Component>
               </SubComponents>
             </Container>

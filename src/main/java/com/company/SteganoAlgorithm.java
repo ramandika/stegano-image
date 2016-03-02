@@ -4,9 +4,6 @@ package com.company;
 import com.company.Image.RGB;
 import javafx.util.Pair;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.text.CollationElementIterator;
 import java.util.*;
 
 /**
@@ -56,7 +53,6 @@ public class SteganoAlgorithm {
         wh=((img.getWidth()-1)/M)+1;        // jumlah blok 8x8 menyamping
         he=((img.getHeigth()-1)/N)+1;       // jumlah blok 8x8 menurun
         
-        //System.out.println(wh+"||"+he);
         //iterate all square
         for(int i=0;i<he;i++) {
             for(int j=0;j<wh;j++){
@@ -99,16 +95,6 @@ public class SteganoAlgorithm {
                 }
                 if(i==0)listPixels.add(pixels);
             }
-/*            if(i==0)
-                for(int idx=0;idx<listPixels.size();idx++){
-                    System.out.println("Index 8x8 ke-"+idx);
-                    for(int x=0;x<8;x++) {
-                        for (int y = 0; y < 8; y++)
-                            System.out.print(listPixels.get(idx)[x][y] + " ");
-                        System.out.println();
-                    }
-                    System.out.println("=========================");
-                }*/
         }
         return listPixels;
     }
@@ -298,7 +284,6 @@ public class SteganoAlgorithm {
         return messageBitplane;
     }
     
-    // INI GUE MASIH BINGUNG GIMANA NGECONVERTNYA, TOLONG KERJAIN YA.. :V
     static boolean[][] convertIntToMatrix(long num) throws Exception {
         boolean[][] matrix;
         byte[] byteNum = new byte[8];
@@ -313,12 +298,6 @@ public class SteganoAlgorithm {
                     matrix[a][b] = (((byteNum[a] >> (7 - b)) & 1) != 0);
                 }
         }
-/*        matrix[0][0]=false;
-        for(int i=0;i<8;i++) {
-            for (int j = 0; j < 8; j++)
-                System.out.print((matrix[i][j]?1:0) + " ");
-            System.out.println();
-        }*/
         return matrix;
     }
     
@@ -435,11 +414,11 @@ public class SteganoAlgorithm {
             Pair p = new Pair(o, redComplex.get(o));
             redComplexShuf.add(p);
         }
-        System.out.println("Red Shuffle");
-        for(int i=0;i<redComplexShuf.size();i++){
-            System.out.println(redComplexShuf.get(i).getKey()+"||"+redComplexShuf.get(i).getValue());
-        }
-        System.out.println("============");
+//        System.out.println("Red Shuffle");
+//        for(int i=0;i<redComplexShuf.size();i++){
+//            System.out.println(redComplexShuf.get(i).getKey()+"||"+redComplexShuf.get(i).getValue());
+//        }
+//        System.out.println("============");
 
         //Green Shuffle
         keys=new ArrayList(greenComplex.keySet());
@@ -472,15 +451,10 @@ public class SteganoAlgorithm {
             if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
                 for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
                     boolean[][] imgbool=redCGC.get(pos).bp.get(bits.get(j));
-                    System.out.println("red["+pos+"]"+"bit-"+bits.get(j)+" is substituted");
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    System.out.println("Matrix below is inserted to image");
                     if(imgbool[0][0]) imgbool=conjugate(imgbool);
-                    for(int a=0;a<8;a++)
-                        for(int b=0;b<8;b++)
-                        System.out.print((imgbool[a][b]?1:0)+" ");
                     idxSeq++;
                 }
             }
@@ -493,14 +467,10 @@ public class SteganoAlgorithm {
             if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
                 for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
                     boolean[][] imgbool=greenCGC.get(pos).bp.get(bits.get(j));
-                    System.out.println("green["+pos+"]"+"bit-"+bits.get(j)+" is substituted");
-                    for(int a=0;a<8;a++){
+                    for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                        System.out.println("Matrix below is inserted to image");
-                        if(imgbool[0][0])System.out.println(Arrays.asList(conjugate(imgbool)));
-                        else System.out.println(Arrays.asList(imgbool));
-                    }
+                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -514,14 +484,10 @@ public class SteganoAlgorithm {
             if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
                 for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
                     boolean[][] imgbool=blueCGC.get(pos).bp.get(bits.get(j));
-                    System.out.println("blue["+pos+"]"+"bit-"+bits.get(j)+" is substituted");
-                    for(int a=0;a<8;a++){
+                    for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                        System.out.println("Matrix below is inserted to image");
-                        if(imgbool[0][0])System.out.println(Arrays.asList(conjugate(imgbool)));
-                        else System.out.println(Arrays.asList(imgbool));
-                    }
+                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -633,15 +599,10 @@ public class SteganoAlgorithm {
             if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
                 for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
                     boolean[][] imgbool=redCGC.get(pos).bp.get(bits.get(j));
-                    System.out.println("red["+pos+"]"+"bit-"+bits.get(j)+" is substituted");
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    System.out.println("Matrix below is inserted to image");
                     if(imgbool[0][0]) imgbool=conjugate(imgbool);
-                    for(int a=0;a<8;a++)
-                        for(int b=0;b<8;b++)
-                        System.out.print((imgbool[a][b]?1:0)+" ");
                     idxSeq++;
                 }
             }
@@ -654,14 +615,10 @@ public class SteganoAlgorithm {
             if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
                 for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
                     boolean[][] imgbool=greenCGC.get(pos).bp.get(bits.get(j));
-                    System.out.println("green["+pos+"]"+"bit-"+bits.get(j)+" is substituted");
-                    for(int a=0;a<8;a++){
+                    for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                        System.out.println("Matrix below is inserted to image");
-                        if(imgbool[0][0])System.out.println(Arrays.asList(conjugate(imgbool)));
-                        else System.out.println(Arrays.asList(imgbool));
-                    }
+                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -675,14 +632,10 @@ public class SteganoAlgorithm {
             if(((pos+1)%wh!=0)&&((pos/wh)!=he-1)){
                 for(int j=0;j<bits.size() && idxSeq<msgMatrix.size();j++){
                     boolean[][] imgbool=blueCGC.get(pos).bp.get(bits.get(j));
-                    System.out.println("blue["+pos+"]"+"bit-"+bits.get(j)+" is substituted");
-                    for(int a=0;a<8;a++){
+                    for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                        System.out.println("Matrix below is inserted to image");
-                        if(imgbool[0][0])System.out.println(Arrays.asList(conjugate(imgbool)));
-                        else System.out.println(Arrays.asList(imgbool));
-                    }
+                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -698,14 +651,13 @@ public class SteganoAlgorithm {
     }
 
     public static String getFileHeader(long headerSize, long bodySize, List<Boolean> binary) {
-        System.out.println("headerSize:"+headerSize);
         String header = "";
-        byte data = 0;
         for(int i=0; i<headerSize; i++) {
+            byte data = 0;
             for(int j=0; j<8; j++) {
                 data += ((binary.get(i*8+j)? 1:0) <<(7-j));
             }
-            header.concat(""+(char)data);
+            header += (char)data;
         }
         return header;
     }
@@ -714,7 +666,7 @@ public class SteganoAlgorithm {
         byte[] data = new byte[(int)bodySize];
         for(int i=0; i<(int)bodySize; i++) {
             data[i] = 0;
-            for(int j=0; j<8; j++) data[i] += ((binary.get(i*8+j)? 1:0) << (7-j));
+            for(int j=0; j<8; j++) data[i] += ((binary.get(i*8+j+(int)headerSize*8)? 1:0) << (7-j));
         }
         return data;
     }
@@ -746,10 +698,10 @@ public class SteganoAlgorithm {
             Pair p = new Pair(o, redComplex.get(o));
             redComplexShuf.add(p);
         }
-        System.out.println("Red Shuffle");
-        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(0)));
-        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(1)));
-        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(2)));
+//        System.out.println("Red Shuffle");
+//        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(0)));
+//        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(1)));
+//        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(2)));
 //        for(int i=0;i<redComplexShuf.size();i++){
 //            System.out.println(redComplexShuf.get(i).getKey()+"||"+redComplexShuf.get(i).getValue());
 //        }
@@ -791,20 +743,20 @@ public class SteganoAlgorithm {
                 for (int j = 0; j < bits.size() && bit > 0; j++) {
                     boolean[][] imgbool = redCGC.get(pos).bp.get(bits.get(j));
                     if (imgbool[0][0]) {
-                        System.out.println("Perlu Conjugate => red="+pos+" bits:"+j);
-                        for(int ba=0;ba<8;ba++){
-                            for(int bi=0;bi<8;bi++)
-                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
-                            System.out.println();
-                        }
+//                        System.out.println("Perlu Conjugate => red="+pos+" bits:"+j);
+//                        for(int ba=0;ba<8;ba++){
+//                            for(int bi=0;bi<8;bi++)
+//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
+//                            System.out.println();
+//                        }
                         imgbool = conjugate(imgbool);
-                        System.out.println("Diconjugate");
-                        for(int ba=0;ba<8;ba++){
-                            for(int bi=0;bi<8;bi++)
-                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
-                            System.out.println();
-                        }
-                        System.out.println("==========================");
+//                        System.out.println("Diconjugate");
+//                        for(int ba=0;ba<8;ba++){
+//                            for(int bi=0;bi<8;bi++)
+//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
+//                            System.out.println();
+//                        }
+//                        System.out.println("==========================");
                     }
                     if (counter == 0){
                         extractedHeaderSize = boolToInt(imgbool);
@@ -812,19 +764,114 @@ public class SteganoAlgorithm {
                     } //size+headerinfo
                     else if (counter == 1) {
                         extractedBodySize = boolToInt(imgbool);
-                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
+//                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
                         bit = (extractedHeaderSize + extractedBodySize) * 8;
+//                        System.out.println("jumlah bit seharusnya: "+bit);
                         counter++;
                     } else {
                         for (int a = 0; a < 8; a++)
                             for (int b = 0; b < 8; b++)
                                 if (a != 0 || b != 0) {
-                                    messages.add(imgbool[a][b]);
+                                    if(bit>0)
+                                        messages.add(imgbool[a][b]);
                                     bit--;
                                 }
                     }
                 }
         }
+        
+        //Extract greenComplex
+        for (int i = 0; i < greenComplexShuf.size() && bit > 0; i++) {
+            Pair<Integer, List<Integer>> temp = greenComplexShuf.get(i);
+            int pos = temp.getKey();
+            List<Integer> bits = temp.getValue();
+            if (((pos + 1) % wh != 0) && ((pos / wh) != he - 1))
+                for (int j = 0; j < bits.size() && bit > 0; j++) {
+                    boolean[][] imgbool = greenCGC.get(pos).bp.get(bits.get(j));
+                    if (imgbool[0][0]) {
+//                        System.out.println("Perlu Conjugate => red="+pos+" bits:"+j);
+//                        for(int ba=0;ba<8;ba++){
+//                            for(int bi=0;bi<8;bi++)
+//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
+//                            System.out.println();
+//                        }
+                        imgbool = conjugate(imgbool);
+//                        System.out.println("Diconjugate");
+//                        for(int ba=0;ba<8;ba++){
+//                            for(int bi=0;bi<8;bi++)
+//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
+//                            System.out.println();
+//                        }
+//                        System.out.println("==========================");
+                    }
+                    if (counter == 0){
+                        extractedHeaderSize = boolToInt(imgbool);
+                        counter++;
+                    } //size+headerinfo
+                    else if (counter == 1) {
+                        extractedBodySize = boolToInt(imgbool);
+//                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
+                        bit = (extractedHeaderSize + extractedBodySize) * 8;
+//                        System.out.println("jumlah bit seharusnya: "+bit);
+                        counter++;
+                    } else {
+                        for (int a = 0; a < 8; a++)
+                            for (int b = 0; b < 8; b++)
+                                if (a != 0 || b != 0) {
+                                    if(bit>0)
+                                        messages.add(imgbool[a][b]);
+                                    bit--;
+                                }
+                    }
+                }
+        }
+        
+        //Extract blueComplex
+        for (int i = 0; i < blueComplexShuf.size() && bit > 0; i++) {
+            Pair<Integer, List<Integer>> temp = blueComplexShuf.get(i);
+            int pos = temp.getKey();
+            List<Integer> bits = temp.getValue();
+            if (((pos + 1) % wh != 0) && ((pos / wh) != he - 1))
+                for (int j = 0; j < bits.size() && bit > 0; j++) {
+                    boolean[][] imgbool = blueCGC.get(pos).bp.get(bits.get(j));
+                    if (imgbool[0][0]) {
+//                        System.out.println("Perlu Conjugate => red="+pos+" bits:"+j);
+//                        for(int ba=0;ba<8;ba++){
+//                            for(int bi=0;bi<8;bi++)
+//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
+//                            System.out.println();
+//                        }
+                        imgbool = conjugate(imgbool);
+//                        System.out.println("Diconjugate");
+//                        for(int ba=0;ba<8;ba++){
+//                            for(int bi=0;bi<8;bi++)
+//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
+//                            System.out.println();
+//                        }
+//                        System.out.println("==========================");
+                    }
+                    if (counter == 0){
+                        extractedHeaderSize = boolToInt(imgbool);
+                        counter++;
+                    } //size+headerinfo
+                    else if (counter == 1) {
+                        extractedBodySize = boolToInt(imgbool);
+//                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
+                        bit = (extractedHeaderSize + extractedBodySize) * 8;
+//                        System.out.println("jumlah bit seharusnya: "+bit);
+                        counter++;
+                    } else {
+                        for (int a = 0; a < 8; a++)
+                            for (int b = 0; b < 8; b++)
+                                if (a != 0 || b != 0) {
+                                    if(bit>0)
+                                        messages.add(imgbool[a][b]);
+                                    bit--;
+                                }
+                    }
+                }
+        }
+//        System.out.println("jumlah akhir bit: "+bit);
         //for(int i=0;i<messages.size();i++) System.out.print((messages.get(i)?1:0)+" ");
         return messages;
     }

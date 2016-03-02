@@ -31,6 +31,9 @@ public class GUIStegano extends javax.swing.JFrame {
     private File secretFile;
     private String imgFilePath;
     private com.company.Image stegoImg;
+    private String extractedFileName;
+    private List<Boolean> bodyFile;
+    private byte[] extractedFileBytes;
 
     /**
      * Creates new form GUIStegano
@@ -522,7 +525,6 @@ public class GUIStegano extends javax.swing.JFrame {
             if(inputTextRadioButton.isSelected()) {     // input berupa teks biasa
                 if(messageTextArea.getText().length()<=SteganoAlgorithm.countPayloadByte(imgFilePath)) {
                     try {
-                        //System.out.println(SteganoAlgorithm.alpha);
                         stegoImg = SteganoAlgorithm.insertText(imgFilePath, messageTextArea.getText(), stegoKeyTextField.getText(), useEncryption);
                     } catch (Exception ex) {
                         Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
@@ -531,7 +533,8 @@ public class GUIStegano extends javax.swing.JFrame {
                 else
                     JOptionPane.showMessageDialog(this, "Secret message over payload! ("+SteganoAlgorithm.countPayloadByte(imgFilePath)+"bytes)");
             }
-            else {                      FileInputStream in = null;
+            else {
+                FileInputStream in = null;
                 try {
                     // input pesan rahasia berupa file
                     String headerFile = secretFile.getName();
@@ -575,16 +578,16 @@ public class GUIStegano extends javax.swing.JFrame {
                 decryptButton.setEnabled(true);
                 saveButton.setEnabled(true);
                 SteganoAlgorithm.alpha = (Double) extractComplexitySpinner.getValue();
-                List<Boolean> bodyFile = SteganoAlgorithm.Extract(imgFilePath, stegoKeyExtractTextField.getText());
-                System.out.println("bodyFile size:"+bodyFile.size());
+                bodyFile = SteganoAlgorithm.Extract(imgFilePath, stegoKeyExtractTextField.getText());
                 if(SteganoAlgorithm.extractedHeaderSize==0) {
                     extractedTextArea.setEnabled(true);
                     extractedTextArea.setEditable(false);
                     extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
                 }
                 else {
-                     extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
-                    extractedFileHeaderLabel.setText(new String(SteganoAlgorithm.getFileHeader(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
+                    //extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
+                    extractedFileName = SteganoAlgorithm.getFileHeader(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile);
+                    extractedFileHeaderLabel.setText(extractedFileName);
                 }
             } catch (Exception ex) {
                 Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
@@ -602,7 +605,7 @@ public class GUIStegano extends javax.swing.JFrame {
             decryptedTextArea.setEditable(false);
         }
         else {
-            
+            extractedFileBytes = CipherTools.decryptFileVigenere(extractedFileBytes, stegoKeyExtractTextField.getText());
         }
     }//GEN-LAST:event_decryptButtonActionPerformed
 
@@ -630,21 +633,24 @@ public class GUIStegano extends javax.swing.JFrame {
             }
         }
         else {
+            extractedFileBytes = new byte[(int)SteganoAlgorithm.extractedBodySize];
+            extractedFileBytes = SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile);
+            FileOutputStream fw = null;
             try {
-                // save binary file
-                byte[] encrypted = new byte[8];
-                // BELOM KELAR
-                FileOutputStream outputStream;
-                if(decryptedFileHeaderLabel.getText()!=null)
-                    outputStream = new FileOutputStream(new File("data/message/"+decryptedFileHeaderLabel.getText()));
-                else
-                    outputStream = new FileOutputStream(new File("data/message/"+extractedFileHeaderLabel.getText()));
-                outputStream.write(encrypted);
-                outputStream.close();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+                JFileChooser saveFile = new JFileChooser();
+                saveFile.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                saveFile.showSaveDialog(null);
+                fw = new FileOutputStream(saveFile.getSelectedFile());
+                fw.write(extractedFileBytes);
             } catch (IOException ex) {
-                Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, "Error: Cannot save File!");
+            } finally {
+                try {
+                    fw.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }//GEN-LAST:event_saveButtonActionPerformed
