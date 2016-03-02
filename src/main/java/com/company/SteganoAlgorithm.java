@@ -14,7 +14,7 @@ public class SteganoAlgorithm {
     private static final boolean T=true;
     public static int M=8,N=8;               // M col N row
     private final static int max8x8changing=112;    // jumlah maksimal kemungkinan perubahan warna pada 8x8
-    public static double alpha=0.3;                    // default treshold
+    public static double alpha;                // default treshold
     private static List<int[][]> bitplanes;         // kumpulan blok 8x8 sebuah gambar
     private static final boolean[][] chessBoard = {   // buat conjugate
             {F,T,F,T,F,T,F,T},
@@ -277,7 +277,7 @@ public class SteganoAlgorithm {
                     }
                 }
             }
-            if(isComplexEnough(messageMatrix))
+            if(!isComplexEnough(messageMatrix))
                 messageMatrix = conjugate(messageMatrix);
             messageBitplane.add(messageMatrix);
         }
@@ -390,6 +390,18 @@ public class SteganoAlgorithm {
         msgMatrix.add(bodySizeMat);                         // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
         
+        for(int i=0;i<msgMatrix.size();i++){
+            if(!isComplexEnough(msgMatrix.get(i))){
+                System.out.println("Matriks ke-"+i+" is not complex");
+                for(int a=0;a<8;a++){
+                    for(int b=0;b<8;b++)
+                        System.out.println(((msgMatrix.get(i)[a][b])?1:0)+" ");
+                    System.out.println();
+                }
+                System.out.println("===============================");
+            }
+        }
+        
         Image image=new Image(imgPath);
         bitplanes = to8x8(image);
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
@@ -454,7 +466,6 @@ public class SteganoAlgorithm {
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -470,7 +481,6 @@ public class SteganoAlgorithm {
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -487,7 +497,6 @@ public class SteganoAlgorithm {
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -514,35 +523,6 @@ public class SteganoAlgorithm {
         msgMatrix.add(messageSizeMat);        // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
         System.out.println("msgMatrix size:"+msgMatrix.size()+"||message="+message.length());
-//        for(int i=0;i<msgMatrix.size();i++){
-//            boolean[][] boolarr=msgMatrix.get(i);
-//            if(!SteganoAlgorithm.isComplexEnough(boolarr)){
-//                System.out.println("==============Not to complex :============ ");
-//                for(int huh=0;huh<8;huh++){
-//                    for(int hah=0;hah<8;hah++)
-//                        System.out.print((boolarr[huh][hah]? 1:0)+" ");
-//                System.out.println();
-//                }
-//                System.out.println("==============Make it complex============= : ");
-//                msgMatrix.set(i, SteganoAlgorithm.conjugate(boolarr));
-//                boolarr=msgMatrix.get(i);
-//                for(int huh=0;huh<8;huh++){
-//                    for(int hah=0;hah<8;hah++)
-//                        System.out.print((boolarr[huh][hah]?1:0)+" ");
-//                System.out.println();
-//                }
-//                System.out.println("==============Become complex============= : ");
-//            }
-//            else{
-//                System.out.println("==============Already complex :============ ");
-//                for(int a=0;a<8;a++){
-//                    for(int b=0;b<8;b++)
-//                        System.out.print((boolarr[a][b]?1:0)+" ");
-//                    System.out.println();
-//                }
-//                System.out.println("========================");
-//            }
-//        }
         Image image=new Image(imgPath);
         bitplanes = to8x8(image);
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
@@ -602,7 +582,6 @@ public class SteganoAlgorithm {
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -618,7 +597,6 @@ public class SteganoAlgorithm {
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -635,7 +613,6 @@ public class SteganoAlgorithm {
                     for(int a=0;a<8;a++)
                         for(int b=0;b<8;b++)
                             imgbool[a][b]=msgMatrix.get(idxSeq)[a][b];
-                    if(imgbool[0][0]) imgbool=conjugate(imgbool);
                     idxSeq++;
                 }
             }
@@ -698,15 +675,6 @@ public class SteganoAlgorithm {
             Pair p = new Pair(o, redComplex.get(o));
             redComplexShuf.add(p);
         }
-//        System.out.println("Red Shuffle");
-//        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(0)));
-//        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(1)));
-//        System.out.println(isComplexEnough(redCGC.get(1342).bp.get(2)));
-//        for(int i=0;i<redComplexShuf.size();i++){
-//            System.out.println(redComplexShuf.get(i).getKey()+"||"+redComplexShuf.get(i).getValue());
-//        }
-//        System.out.println("============");
-        //Green Shuffle
         keys = new ArrayList(greenComplex.keySet());
         templist = null;
         Collections.shuffle(keys, new Random(seed));
@@ -743,20 +711,7 @@ public class SteganoAlgorithm {
                 for (int j = 0; j < bits.size() && bit > 0; j++) {
                     boolean[][] imgbool = redCGC.get(pos).bp.get(bits.get(j));
                     if (imgbool[0][0]) {
-//                        System.out.println("Perlu Conjugate => red="+pos+" bits:"+j);
-//                        for(int ba=0;ba<8;ba++){
-//                            for(int bi=0;bi<8;bi++)
-//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
-//                            System.out.println();
-//                        }
                         imgbool = conjugate(imgbool);
-//                        System.out.println("Diconjugate");
-//                        for(int ba=0;ba<8;ba++){
-//                            for(int bi=0;bi<8;bi++)
-//                                System.out.print((imgbool[ba][bi] ? 1:0)+" ");
-//                            System.out.println();
-//                        }
-//                        System.out.println("==========================");
                     }
                     if (counter == 0){
                         extractedHeaderSize = boolToInt(imgbool);
@@ -764,9 +719,8 @@ public class SteganoAlgorithm {
                     } //size+headerinfo
                     else if (counter == 1) {
                         extractedBodySize = boolToInt(imgbool);
-//                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
+                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
                         bit = (extractedHeaderSize + extractedBodySize) * 8;
-//                        System.out.println("jumlah bit seharusnya: "+bit);
                         counter++;
                     } else {
                         for (int a = 0; a < 8; a++)
