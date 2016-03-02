@@ -2,6 +2,7 @@ package com.company;
 
 
 import com.company.Image.RGB;
+import java.nio.charset.Charset;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -236,7 +237,7 @@ public class SteganoAlgorithm {
      * @return 
      */
     public static List<Boolean> convertMessageToBinary(String message) {
-        byte[] messageBin = message.getBytes();
+        byte[] messageBin = message.getBytes(Charset.forName("UTF-8"));
         List<Boolean> messageBitplane = new ArrayList<Boolean>();
         
         for(int x=0; x<messageBin.length; x++) {
@@ -514,8 +515,12 @@ public class SteganoAlgorithm {
 
     public static Image insertText(String imgPath, String message, String key,boolean isEncrypted) throws Exception {
         int idxSeq = 0;
+        System.out.println("message asli         : "+message);
         if(isEncrypted) message = CipherTools.encryptVigenereExtended(message, key);
+        System.out.println("encrypted size: "+message.length());
         List<Boolean> binaryMsg = convertMessageToBinary(message);
+        System.out.println("encrypted            : "+message);
+        System.out.println("encrypted from matrix: "+new String(getContent(0, message.length(), binaryMsg)));
         List<boolean[][]> msgMatrix = new ArrayList();
         msgMatrix.add(conjugate(convertIntToMatrix(0)));                       // parameternya info size header, 0 karena bukan nyisipin file
         boolean[][] messageSizeMat=convertIntToMatrix(message.length());

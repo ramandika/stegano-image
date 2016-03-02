@@ -13,6 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,6 +35,7 @@ public class GUIStegano extends javax.swing.JFrame {
     private String extractedFileName;
     private List<Boolean> bodyFile;
     private byte[] extractedFileBytes;
+    private String extractedString;
 
     /**
      * Creates new form GUIStegano
@@ -474,6 +476,10 @@ public class GUIStegano extends javax.swing.JFrame {
 
     private void selectStegoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectStegoButtonActionPerformed
         final JFileChooser fc = new JFileChooser();
+        extractedTextArea.setText(null);
+        extractedTextArea.setEnabled(false);
+        decryptedTextArea.setText(null);
+        decryptedTextArea.setEnabled(false);
         //In response to a button click:
         fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
         int returnVal = fc.showOpenDialog(this);
@@ -582,7 +588,8 @@ public class GUIStegano extends javax.swing.JFrame {
                 if(SteganoAlgorithm.extractedHeaderSize==0) {
                     extractedTextArea.setEnabled(true);
                     extractedTextArea.setEditable(false);
-                    extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
+                    extractedString = new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile), Charset.forName("UTF-8"));
+                    extractedTextArea.setText(extractedString);
                 }
                 else {
                     //extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
@@ -601,7 +608,7 @@ public class GUIStegano extends javax.swing.JFrame {
     private void decryptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_decryptButtonActionPerformed
         if(extractedTextArea.isEnabled()) {
             decryptedTextArea.setEnabled(true);
-            decryptedTextArea.setText(CipherTools.decryptVigenereExtended(extractedTextArea.getText(), stegoKeyExtractTextField.getText()));
+            decryptedTextArea.setText(CipherTools.decryptVigenereExtended(extractedString, stegoKeyExtractTextField.getText()));
             decryptedTextArea.setEditable(false);
         }
         else {
