@@ -237,16 +237,23 @@ public class SteganoAlgorithm {
      * @return 
      */
     public static List<Boolean> convertMessageToBinary(String message) {
-        byte[] messageBin = message.getBytes(Charset.forName("UTF-8"));
         List<Boolean> messageBitplane = new ArrayList<Boolean>();
         
-        for(int x=0; x<messageBin.length; x++) {
+        for(int x=0; x<message.length(); x++) {
             boolean bit;
+            char c= message.charAt(x);
             for(int i=0; i<8; i++) {
-                bit = ((messageBin[x] & 0xff) & (1 << 7-i))!=0;
+                bit = (c & (1 << 7-i))!=0;
                 messageBitplane.add(bit);
             }
         }
+        System.out.println("BINARY COEG");
+        for(int i=0;i<messageBitplane.size();i++){
+            System.out.print((messageBitplane.get(i)?1:0)+" ");
+            if((i+1)%8==0) System.out.println();
+        }
+        System.out.println("======================");
+        
         return messageBitplane;
     }
     
@@ -257,16 +264,15 @@ public class SteganoAlgorithm {
      */
     public static List<boolean[][]> convertMessageToMatrix(List<Boolean> message) {
         List<boolean[][]> messageBitplane = new ArrayList();
-        //System.out.println("ukuran message : "+ message.size());
+        System.out.println("convertMessageToMatrix:"+message);
         boolean[][] messageMatrix;
         
-        for(int x=0; x<message.size(); x++) {
+        for(int x=0; x<message.size();) {
             messageMatrix = new boolean[8][8];
             for(int i=0; i<messageMatrix.length; i++) {
                 for(int j=0; j<messageMatrix[i].length; j++) {
                     if(i==0&&j==0) {
                         messageMatrix[i][j] = false;
-                        if(x!=0) x--;
                     }
                     else {
                         if(x<message.size()) {
@@ -515,12 +521,8 @@ public class SteganoAlgorithm {
 
     public static Image insertText(String imgPath, String message, String key,boolean isEncrypted) throws Exception {
         int idxSeq = 0;
-        System.out.println("message asli         : "+message);
         if(isEncrypted) message = CipherTools.encryptVigenereExtended(message, key);
-        System.out.println("encrypted size: "+message.length());
         List<Boolean> binaryMsg = convertMessageToBinary(message);
-        System.out.println("encrypted            : "+message);
-        System.out.println("encrypted from matrix: "+new String(getContent(0, message.length(), binaryMsg)));
         List<boolean[][]> msgMatrix = new ArrayList();
         msgMatrix.add(conjugate(convertIntToMatrix(0)));                       // parameternya info size header, 0 karena bukan nyisipin file
         boolean[][] messageSizeMat=convertIntToMatrix(message.length());
@@ -528,6 +530,21 @@ public class SteganoAlgorithm {
         msgMatrix.add(messageSizeMat);        // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
         System.out.println("msgMatrix size:"+msgMatrix.size()+"||message="+message.length());
+        
+        System.out.println("ALL msgMatrix");
+        for(int size=0;size<msgMatrix.size();size++){
+            boolean[][] temp;
+            if(msgMatrix.get(size)[0][0]) temp=conjugate(msgMatrix.get(size));
+            else  temp=(msgMatrix.get(size));
+            
+            for(int a=0;a<8;a++){
+                for(int b=0;b<8;b++){
+                    System.out.print((temp[a][b]?1:0)+" ");
+                }
+                System.out.println();
+            }
+            System.out.println("======================");
+        }
         Image image=new Image(imgPath);
         bitplanes = to8x8(image);
         List<BitPlane> redPBC = toPBC(bitplanes, 'R');
@@ -649,6 +666,16 @@ public class SteganoAlgorithm {
         for(int i=0; i<(int)bodySize; i++) {
             data[i] = 0;
             for(int j=0; j<8; j++) data[i] += ((binary.get(i*8+j+(int)headerSize*8)? 1:0) << (7-j));
+        }
+        //Data extracted
+        System.out.println("Data extracted");
+        for(int i=0;i<data.length;i++){
+            
+            for(int j=0;j<8;j++){
+                boolean b=(data[i]&(1<<(7-j)))!=0;
+                System.out.print((b?1:0)+" ");
+            }
+            System.out.println();
         }
         return data;
     }

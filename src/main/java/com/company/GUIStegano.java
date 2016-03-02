@@ -588,11 +588,20 @@ public class GUIStegano extends javax.swing.JFrame {
                 if(SteganoAlgorithm.extractedHeaderSize==0) {
                     extractedTextArea.setEnabled(true);
                     extractedTextArea.setEditable(false);
-                    extractedString = new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile), Charset.forName("UTF-8"));
+                    extractedString = new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile),"ISO-8859-1");
+//                    //Data extracted
+//                    System.out.println("Data extracted GUI");
+//                    for(int i=0;i<extractedString.length();i++){
+//
+//                        for(int j=0;j<8;j++){
+//                            boolean b=(extractedString.charAt(i)&(1<<(7-j)))!=0;
+//                            System.out.print((b?1:0)+" ");
+//                        }
+//                        System.out.println();
+//                    }
                     extractedTextArea.setText(extractedString);
                 }
                 else {
-                    //extractedTextArea.setText(new String(SteganoAlgorithm.getContent(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile)));
                     extractedFileName = SteganoAlgorithm.getFileHeader(SteganoAlgorithm.extractedHeaderSize, SteganoAlgorithm.extractedBodySize, bodyFile);
                     extractedFileHeaderLabel.setText(extractedFileName);
                 }

@@ -80,6 +80,16 @@ public class CipherTools {
     }
     
     static String decryptVigenereExtended(String cipher, String key) {
+        //Data extracted
+        System.out.println("In Vigenere extracted");
+        for(int i=0;i<cipher.length();i++){
+            
+            for(int j=0;j<8;j++){
+                boolean b=(cipher.charAt(i)&(1<<(7-j)))!=0;
+                System.out.print((b?1:0)+" ");
+            }
+            System.out.println();
+        }
         int skip = 0;
         char[] plain = new char[cipher.length()];
         for(int i=0; i<cipher.length(); i++) {
