@@ -531,7 +531,8 @@ public class GUIStegano extends javax.swing.JFrame {
             if(inputTextRadioButton.isSelected()) {     // input berupa teks biasa
                 if(messageTextArea.getText().length()<=SteganoAlgorithm.countPayloadByte(imgFilePath)) {
                     try {
-                        stegoImg = SteganoAlgorithm.insertText(imgFilePath, messageTextArea.getText(), stegoKeyTextField.getText(), useEncryption);
+                        String text=new String(messageTextArea.getText().getBytes(), "ISO-8859-1");
+                        stegoImg = SteganoAlgorithm.insertText(imgFilePath, text, stegoKeyTextField.getText(), useEncryption);
                     } catch (Exception ex) {
                         Logger.getLogger(GUIStegano.class.getName()).log(Level.SEVERE, null, ex);
                     }
