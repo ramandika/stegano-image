@@ -2,7 +2,6 @@ package com.company;
 
 
 import com.company.Image.RGB;
-import java.nio.charset.Charset;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -247,12 +246,12 @@ public class SteganoAlgorithm {
                 messageBitplane.add(bit);
             }
         }
-        System.out.println("BINARY COEG");
-        for(int i=0;i<messageBitplane.size();i++){
-            System.out.print((messageBitplane.get(i)?1:0)+" ");
-            if((i+1)%8==0) System.out.println();
-        }
-        System.out.println("======================");
+//        System.out.println("BINARY COEG");
+//        for(int i=0;i<messageBitplane.size();i++){
+//            System.out.print((messageBitplane.get(i)?1:0)+" ");
+//            if((i+1)%8==0) System.out.println();
+//        }
+//        System.out.println("======================");
         
         return messageBitplane;
     }
@@ -264,7 +263,7 @@ public class SteganoAlgorithm {
      */
     public static List<boolean[][]> convertMessageToMatrix(List<Boolean> message) {
         List<boolean[][]> messageBitplane = new ArrayList();
-        System.out.println("convertMessageToMatrix:"+message);
+        //System.out.println("convertMessageToMatrix:"+message);
         boolean[][] messageMatrix;
         
         for(int x=0; x<message.size();) {
@@ -398,8 +397,7 @@ public class SteganoAlgorithm {
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
         
         for(int i=0;i<msgMatrix.size();i++){
-            if(!isComplexEnough(msgMatrix.get(i))){
-                System.out.println("Matriks ke-"+i+" is not complex");
+            if(!isComplexEnough(msgMatrix.get(i))){System.out.println("Matriks ke-"+i+" is not complex");
                 for(int a=0;a<8;a++){
                     for(int b=0;b<8;b++)
                         System.out.println(((msgMatrix.get(i)[a][b])?1:0)+" ");
@@ -529,21 +527,21 @@ public class SteganoAlgorithm {
         if(!isComplexEnough(messageSizeMat)) messageSizeMat=conjugate(messageSizeMat);
         msgMatrix.add(messageSizeMat);        // parameternya info size dr text yang akan di-embed
         msgMatrix.addAll(convertMessageToMatrix(binaryMsg));
-        System.out.println("msgMatrix size:"+msgMatrix.size()+"||message="+message.length());
+        //System.out.println("msgMatrix size:"+msgMatrix.size()+"||message="+message.length());
         
-        System.out.println("ALL msgMatrix");
+        //System.out.println("ALL msgMatrix");
         for(int size=0;size<msgMatrix.size();size++){
             boolean[][] temp;
             if(msgMatrix.get(size)[0][0]) temp=conjugate(msgMatrix.get(size));
             else  temp=(msgMatrix.get(size));
             
-            for(int a=0;a<8;a++){
-                for(int b=0;b<8;b++){
-                    System.out.print((temp[a][b]?1:0)+" ");
-                }
-                System.out.println();
-            }
-            System.out.println("======================");
+//            for(int a=0;a<8;a++){
+//                for(int b=0;b<8;b++){
+//                    System.out.print((temp[a][b]?1:0)+" ");
+//                }
+//                System.out.println();
+//            }
+//            System.out.println("======================");
         }
         Image image=new Image(imgPath);
         bitplanes = to8x8(image);
@@ -668,15 +666,15 @@ public class SteganoAlgorithm {
             for(int j=0; j<8; j++) data[i] += ((binary.get(i*8+j+(int)headerSize*8)? 1:0) << (7-j));
         }
         //Data extracted
-        System.out.println("Data extracted");
-        for(int i=0;i<data.length;i++){
-            
-            for(int j=0;j<8;j++){
-                boolean b=(data[i]&(1<<(7-j)))!=0;
-                System.out.print((b?1:0)+" ");
-            }
-            System.out.println();
-        }
+//        System.out.println("Data extracted");
+//        for(int i=0;i<data.length;i++){
+//            
+//            for(int j=0;j<8;j++){
+//                boolean b=(data[i]&(1<<(7-j)))!=0;
+//                System.out.print((b?1:0)+" ");
+//            }
+//            System.out.println();
+//        }
         return data;
     }
 
@@ -751,7 +749,7 @@ public class SteganoAlgorithm {
                     } //size+headerinfo
                     else if (counter == 1) {
                         extractedBodySize = boolToInt(imgbool);
-                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
+//                        System.out.println("ukuran header/body:"+extractedHeaderSize+" "+extractedBodySize);
                         bit = (extractedHeaderSize + extractedBodySize) * 8;
                         counter++;
                     } else {
