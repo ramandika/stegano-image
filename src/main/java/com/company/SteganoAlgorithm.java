@@ -346,7 +346,10 @@ public class SteganoAlgorithm {
                 }
             }
         }
-        return (NbBit-126)/8;
+        if((NbBit-126)/8>0)
+            return (NbBit-126)/8;
+        else
+            return 0;
     }
     
     static int getSeedFromKey(String key) {
